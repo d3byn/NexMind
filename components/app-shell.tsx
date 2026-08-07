@@ -47,7 +47,7 @@ const navGroups: NavGroup[] = [
     label: "Workspace",
     items: [
       { label: "Calendar", href: "/calendar", icon: CalendarDays, color: "text-sage-600" },
-      { label: "Task / Kanban", href: "#", icon: Columns3, color: "text-amber-600" },
+      { label: "Task / Kanban", href: "/kanban", icon: Columns3, color: "text-amber-600" },
       { label: "Notes", href: "#", icon: FileText, color: "text-sky-600" },
       { label: "Whiteboard", href: "#", icon: PenTool, color: "text-coral-500" },
       { label: "Pages / Spaces", href: "#", icon: Users, color: "text-teal-600" },
@@ -63,7 +63,7 @@ const navGroups: NavGroup[] = [
 ];
 
 type AppShellProps = {
-  activePage: "dashboard" | "calendar";
+  activePage: "dashboard" | "calendar" | "kanban";
   children: ReactNode;
 };
 
@@ -89,7 +89,7 @@ export function AppShell({ activePage, children }: AppShellProps) {
                 collapsed && "pointer-events-none opacity-0",
               )}
             >
-              <p className="truncate text-[13px] font-semibold leading-5">Flowbase</p>
+              <p className="truncate text-[13px] font-semibold leading-5">NexMind</p>
               <p className="truncate text-xs text-muted-foreground">Cozy workspace</p>
             </div>
           </div>
@@ -136,7 +136,8 @@ export function AppShell({ activePage, children }: AppShellProps) {
                   const Icon = item.icon;
                   const active =
                     (activePage === "dashboard" && item.href === "/") ||
-                    (activePage === "calendar" && item.href === "/calendar");
+                    (activePage === "calendar" && item.href === "/calendar") ||
+                    (activePage === "kanban" && item.href === "/kanban");
 
                   return (
                     <Link
