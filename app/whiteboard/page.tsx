@@ -23,7 +23,7 @@ export default async function WhiteboardPage() {
 
     return (
         <AppShell activePage="whiteboard" generatedSidebarApps={sidebarApps}>
-            <section className="flex h-screen min-h-[46rem] w-full flex-col overflow-hidden bg-background">
+            <section className="flex h-screen min-h-[46rem] w-full flex-col overflow-hidden">
                 <header className="shrink-0 border-b border-border px-4 py-3 sm:px-5">
                     <p className="flex items-center gap-2 text-sm font-medium text-primary">
                         <PenTool className="size-4 text-coral-500" aria-hidden="true" />

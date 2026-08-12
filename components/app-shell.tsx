@@ -92,12 +92,12 @@ export function AppShell({ activePage, generatedSidebarApps = [], children }: Ap
   }
 
   return (
-    // Two soft colour washes give the flat background some depth without touching contrast on cards.
-    <div className="h-screen bg-background bg-[radial-gradient(1100px_560px_at_8%_-8%,hsl(254_92%_92%/.85),transparent_60%),radial-gradient(900px_500px_at_100%_4%,hsl(190_92%_90%/.6),transparent_55%)] text-foreground">
+    // Transparent so the cozy body gradient shows through the whole shell.
+    <div className="h-screen text-foreground">
       <div className="flex h-screen overflow-hidden">
         <aside
           className={cn(
-            "flex h-screen max-h-screen shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar px-2.5 py-3.5 shadow-[1px_0_24px_rgba(39,39,87,0.06)] transition-[width] duration-300 ease-out",
+            "flex h-screen max-h-screen shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar/75 px-2.5 py-3.5 shadow-[1px_0_24px_rgba(39,39,87,0.06)] backdrop-blur-xl transition-[width] duration-300 ease-out",
             collapsed ? "w-[4.5rem]" : "w-64 max-sm:w-[4.5rem]",
           )}
         >
