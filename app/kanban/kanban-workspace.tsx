@@ -779,7 +779,6 @@ function KanbanColumn({
   const [dropIndex, setDropIndex] = useState<number | null>(null);
   const isDragging = draggingTaskId !== null;
 
-  // A single source of truth for the insertion point: cards claim their own index, the empty space below claims the end.
   function hoverAt(index: number) {
     setDropIndex(index);
     onDragOverColumn(column.id);
@@ -801,7 +800,6 @@ function KanbanColumn({
         hoverAt(column.tasks.length);
       }}
       onDragLeave={(event) => {
-        // dragleave also fires when the cursor moves onto a card inside the column, which would flicker the highlight.
         if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
         clearHover();
       }}

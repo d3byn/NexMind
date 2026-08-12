@@ -91,6 +91,7 @@ const colorStyles: Record<
         dot: string;
         chip: string;
         soft: string;
+        text: string;
         active: string;
     }
 > = {
@@ -99,35 +100,40 @@ const colorStyles: Record<
         dot: "bg-sage-600",
         chip: "bg-sage-100 text-sage-800",
         soft: "bg-sage-100/70",
-        active: "border-sage-400 bg-sage-100/70",
+        text: "text-sage-700",
+        active: "border-sage-400 bg-sage-100/60 ring-1 ring-sage-400/40",
     },
     clay: {
         label: "Clay",
         dot: "bg-clay-600",
         chip: "bg-clay-100 text-clay-800",
         soft: "bg-clay-100/70",
-        active: "border-clay-400 bg-clay-100/70",
+        text: "text-clay-700",
+        active: "border-clay-400 bg-clay-100/60 ring-1 ring-clay-400/40",
     },
     amber: {
         label: "Amber",
         dot: "bg-amber-600",
         chip: "bg-amber-100 text-amber-800",
         soft: "bg-amber-100/70",
-        active: "border-amber-400 bg-amber-100/70",
+        text: "text-amber-700",
+        active: "border-amber-400 bg-amber-100/60 ring-1 ring-amber-400/40",
     },
     sky: {
         label: "Sky",
         dot: "bg-sky-500",
         chip: "bg-sky-100 text-sky-800",
         soft: "bg-sky-100/70",
-        active: "border-sky-400 bg-sky-100/70",
+        text: "text-sky-700",
+        active: "border-sky-400 bg-sky-100/60 ring-1 ring-sky-400/40",
     },
     violet: {
         label: "Violet",
         dot: "bg-violet-500",
         chip: "bg-violet-100 text-violet-800",
         soft: "bg-violet-100/70",
-        active: "border-violet-400 bg-violet-100/70",
+        text: "text-violet-700",
+        active: "border-violet-400 bg-violet-100/60 ring-1 ring-violet-400/40",
     },
 };
 
@@ -274,6 +280,21 @@ export function NotesWorkspace({
                 new Date(left.updatedAt).getTime()
         );
     }, [activeNotes, searchQuery]);
+
+    // Pinned notes already sort first; grouping them under a heading makes that block read as deliberate rather than incidental.
+    const noteGroups = useMemo(() => {
+        const pinned = filteredNotes.filter((note) => note.isPinned);
+        const rest = filteredNotes.filter((note) => !note.isPinned);
+
+        if (pinned.length === 0) {
+            return [{ label: "All notes", notes: rest, pinned: false, showLabel: false }];
+        }
+
+        return [
+            { label: "Pinned", notes: pinned, pinned: true, showLabel: true },
+            ...(rest.length > 0 ? [{ label: "All notes", notes: rest, pinned: false, showLabel: true }] : []),
+        ];
+    }, [filteredNotes]);
 
     const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     const titleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -787,11 +808,11 @@ export function NotesWorkspace({
 
     return (
         <div className="grid min-h-0 flex-1 grid-cols-1 gap-5 lg:grid-cols-[21rem_minmax(0,1fr)]">
-            <aside className="flex min-h-[22rem] flex-col overflow-hidden rounded-lg bg-sidebar/70 lg:min-h-0">
-                <div className="shrink-0 px-3 pb-3 pt-2">
+            <aside className="flex min-h-[22rem] flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm lg:min-h-0">
+                <div className="shrink-0 border-b border-border px-3 pb-3 pt-3">
                     <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                            <p className="text-xs font-semibold uppercase leading-5 text-muted-foreground">Library</p>
+                            <p className="text-xs font-semibold uppercase tracking-[0.08em] leading-5 text-muted-foreground">Library</p>
                             <h2 className="truncate text-lg font-semibold leading-7">Notes desk</h2>
                         </div>
                         <Button
@@ -807,92 +828,119 @@ export function NotesWorkspace({
                         </Button>
                     </div>
 
-                    <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                        <span>{activeNotes.length} active</span>
-                        <span className="h-1 w-1 rounded-full bg-border" />
-                        <span>{pinnedCount} pinned</span>
-                        <span className="h-1 w-1 rounded-full bg-border" />
-                        <span>{trashedNotes.length} trashed</span>
+                    <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                        <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold tabular-nums text-muted-foreground">
+                            {activeNotes.length} active
+                        </span>
+                        <span className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold tabular-nums text-primary">
+                            <Pin className="size-3 fill-current" aria-hidden="true" />
+                            {pinnedCount} pinned
+                        </span>
+                        <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold tabular-nums text-muted-foreground">
+                            {trashedNotes.length} trashed
+                        </span>
                     </div>
 
-                    <div className="mt-3 flex items-center gap-2">
-                        <div className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-lg bg-muted/70 px-3 text-sm focus-within:bg-card focus-within:ring-2 focus-within:ring-primary/10">
-                            <Search
-                                className="size-4 shrink-0 text-muted-foreground"
-                                aria-hidden="true"
-                            />
-                            <input
-                                value={searchQuery}
-                                onChange={(event) => setSearchQuery(event.target.value)}
-                                placeholder="Search notes"
-                                className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                            />
-                        </div>
+                    <div className="mt-2.5 flex h-10 min-w-0 items-center gap-2 rounded-lg border border-transparent bg-muted/70 px-3 text-sm transition-colors focus-within:border-primary/40 focus-within:bg-card focus-within:ring-2 focus-within:ring-primary/10">
+                        <Search
+                            className="size-4 shrink-0 text-muted-foreground"
+                            aria-hidden="true"
+                        />
+                        <input
+                            value={searchQuery}
+                            onChange={(event) => setSearchQuery(event.target.value)}
+                            placeholder="Search notes"
+                            className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                        />
+                        {searchQuery && (
+                            <button
+                                type="button"
+                                onClick={() => setSearchQuery("")}
+                                className="shrink-0 rounded-md p-0.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                                aria-label="Clear search"
+                            >
+                                <X className="size-3.5" aria-hidden="true" />
+                            </button>
+                        )}
                     </div>
                 </div>
 
-                <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
+                <div className="min-h-0 flex-1 overflow-y-auto bg-background/50 px-2 py-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     {filteredNotes.length === 0 ? (
-                        <div className="flex h-full min-h-40 flex-col items-center justify-center rounded-lg px-4 text-center">
+                        <div className="flex h-full min-h-40 flex-col items-center justify-center rounded-xl border border-dashed border-border px-4 text-center">
                             <FileText
                                 className="size-5 text-muted-foreground"
                                 aria-hidden="true"
                             />
                             <p className="mt-2 text-sm font-medium">No notes found</p>
                             <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                                Create a fresh page or clear search.
+                                {searchQuery ? "Nothing matches that search." : "Create a fresh page to get started."}
                             </p>
                         </div>
                     ) : (
-                        <div className="space-y-2">
-                            {filteredNotes.map((note) => (
-                                <NoteRow
-                                    key={note.id}
-                                    note={note}
-                                    selected={note.id === selectedNote?.id}
-                                    menuOpen={openMenuId === note.id}
-                                    onSelect={() => setSelectedNoteId(note.id)}
-                                    onMenu={() =>
-                                        setOpenMenuId((current) =>
-                                            current === note.id ? null : note.id
-                                        )
-                                    }
-                                    onPin={() =>
-                                        updateMetadata(note.id, {
-                                            isPinned: !note.isPinned,
-                                        })
-                                    }
-                                    onColor={(color) => updateMetadata(note.id, { color })}
-                                    onIcon={(icon) => updateMetadata(note.id, { icon })}
-                                    onCategory={(category) => updateMetadata(note.id, { category })}
-                                    onDuplicate={() => duplicateSelected(note.id)}
-                                    onTrash={() => moveToTrash(note.id)}
-                                    categories={categories}
-                                />
-                            ))}
-                        </div>
+                        noteGroups.map((group) => (
+                            <div key={group.label} className="mb-3 last:mb-0">
+                                {group.showLabel && (
+                                    <p className="flex items-center gap-1.5 px-1.5 pb-1.5 pt-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                                        {group.pinned && <Pin className="size-3 fill-current text-primary" aria-hidden="true" />}
+                                        {group.label}
+                                        <span className="tabular-nums">({group.notes.length})</span>
+                                    </p>
+                                )}
+                                <div className="space-y-2">
+                                    {group.notes.map((note) => (
+                                        <NoteRow
+                                            key={note.id}
+                                            note={note}
+                                            selected={note.id === selectedNote?.id}
+                                            menuOpen={openMenuId === note.id}
+                                            onSelect={() => setSelectedNoteId(note.id)}
+                                            onMenu={() =>
+                                                setOpenMenuId((current) =>
+                                                    current === note.id ? null : note.id
+                                                )
+                                            }
+                                            onPin={() =>
+                                                updateMetadata(note.id, {
+                                                    isPinned: !note.isPinned,
+                                                })
+                                            }
+                                            onColor={(color) => updateMetadata(note.id, { color })}
+                                            onIcon={(icon) => updateMetadata(note.id, { icon })}
+                                            onCategory={(category) => updateMetadata(note.id, { category })}
+                                            onDuplicate={() => duplicateSelected(note.id)}
+                                            onTrash={() => moveToTrash(note.id)}
+                                            categories={categories}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        ))
                     )}
                 </div>
 
-                <div className="shrink-0 px-2 pb-2 pt-1">
+                <div className="shrink-0 border-t border-border bg-card px-2 pb-2 pt-2">
                     <button
                         type="button"
                         onClick={() => setTrashOpen((value) => !value)}
-                        className="flex h-10 w-full items-center justify-between rounded-lg px-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        className="flex h-10 w-full items-center justify-between rounded-lg px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                     >
                         <span className="flex items-center gap-2">
                             <Trash2 className="size-4" aria-hidden="true" />
                             Trash
                         </span>
-                        <span className="rounded-md bg-muted px-1.5 py-0.5 text-[11px]">
-                            {trashedNotes.length}
+                        <span className="flex items-center gap-1.5">
+                            <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold tabular-nums">
+                                {trashedNotes.length}
+                            </span>
+                            <ChevronDown className={cn("size-3.5 transition-transform", trashOpen && "rotate-180")} aria-hidden="true" />
                         </span>
                     </button>
 
                     {trashOpen && (
-                        <div className="mt-2 max-h-48 space-y-1.5 overflow-y-auto">
+                        <div className="mt-2 max-h-48 space-y-1.5 overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                             {trashedNotes.length === 0 ? (
-                                <p className="px-2.5 py-2 text-xs text-muted-foreground">
+                                <p className="rounded-lg border border-dashed border-border px-2.5 py-3 text-center text-xs text-muted-foreground">
                                     Trash is empty.
                                 </p>
                             ) : (
@@ -902,12 +950,12 @@ export function NotesWorkspace({
                                     return (
                                         <div
                                             key={note.id}
-                                            className="flex items-center gap-2 rounded-lg bg-muted/60 p-2"
+                                            className="flex items-center gap-2 rounded-lg border border-border bg-background/60 p-2 transition-colors hover:bg-muted/60"
                                         >
                                             <Icon
                                                 className={cn(
                                                     "size-4 shrink-0",
-                                                    colorStyles[note.color].chip
+                                                    colorStyles[note.color].text
                                                 )}
                                                 aria-hidden="true"
                                             />
@@ -955,16 +1003,18 @@ export function NotesWorkspace({
                 </div>
             </aside>
 
-            <main className="relative flex min-h-[40rem] min-w-0 flex-col overflow-hidden rounded-lg bg-[hsl(42_82%_99%)] lg:min-h-0">
+            <main className="relative flex min-h-[40rem] min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-[hsl(42_82%_99%)] shadow-sm lg:min-h-0">
                 {selectedNote ? (
                     <>
-                        <div className="sticky top-0 z-10 shrink-0 bg-[hsl(42_82%_99%)]/95 px-3 py-3 backdrop-blur-xl sm:px-5">
+                        <span className={cn("h-1 w-full shrink-0", colorStyles[selectedNote.color].dot)} aria-hidden="true" />
+                        <div className="sticky top-0 z-10 shrink-0 border-b border-border bg-[hsl(42_82%_99%)]/95 px-3 py-3 backdrop-blur-xl sm:px-5">
                             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                                 <div className="flex min-w-0 items-center gap-3">
                                     <div
                                         className={cn(
-                                            "flex size-11 shrink-0 items-center justify-center rounded-lg",
-                                            colorStyles[selectedNote.color].soft
+                                            "flex size-11 shrink-0 items-center justify-center rounded-xl",
+                                            colorStyles[selectedNote.color].soft,
+                                            colorStyles[selectedNote.color].text
                                         )}
                                     >
                                         <SelectedIcon className="size-5" aria-hidden="true" />
@@ -985,15 +1035,28 @@ export function NotesWorkspace({
                                     </div>
                                 </div>
 
-                                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                                <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
                                     <span
                                         className={cn(
-                                            "rounded-full px-2.5 py-1",
+                                            "flex items-center gap-1.5 rounded-full px-2.5 py-1",
                                             saveState === "error"
                                                 ? "bg-destructive/10 text-destructive"
-                                                : "bg-muted/80 text-muted-foreground"
+                                                : saveState === "saving"
+                                                    ? "bg-amber-100 text-amber-800"
+                                                    : "bg-sage-100 text-sage-800"
                                         )}
                                     >
+                                        <span
+                                            className={cn(
+                                                "size-1.5 rounded-full",
+                                                saveState === "error"
+                                                    ? "bg-destructive"
+                                                    : saveState === "saving"
+                                                        ? "bg-amber-600 animate-pulse"
+                                                        : "bg-sage-600"
+                                            )}
+                                            aria-hidden="true"
+                                        />
                                         {saveState === "saving"
                                             ? "Saving..."
                                             : saveState === "error"
@@ -1001,7 +1064,7 @@ export function NotesWorkspace({
                                                 : "Saved"}
                                     </span>
 
-                                    <span className="rounded-full bg-muted/80 px-2.5 py-1">
+                                    <span className="rounded-full bg-muted px-2.5 py-1 tabular-nums">
                                         {editor?.storage.characterCount.words() ??
                                             selectedNote.wordCount}{" "}
                                         words
@@ -1147,10 +1210,11 @@ export function NotesWorkspace({
                                 </BubbleMenu>
                             )}
 
+                            {/* The sheet gives the editor a page to sit on instead of floating in the pane background. */}
                             <EditorContent
                                 editor={editor}
                                 className={cn(
-                                    "mx-auto max-w-4xl px-5 py-6 sm:px-8 lg:px-12",
+                                    "mx-auto max-w-4xl rounded-xl border border-border bg-card px-5 py-6 shadow-sm sm:px-8 lg:px-12",
                                     selectedNote.isTrashed && "pointer-events-none opacity-60"
                                 )}
                             />
@@ -1206,15 +1270,17 @@ export function NotesWorkspace({
                         )}
                     </>
                 ) : (
-                    <div className="flex min-h-96 flex-1 flex-col items-center justify-center px-6 text-center">
-                        <FileText className="size-8 text-muted-foreground" aria-hidden="true" />
-                        <h2 className="mt-3 text-lg font-semibold">Start a note</h2>
-                        <p className="mt-1 max-w-sm text-sm leading-6 text-muted-foreground">
+                    <div className="flex min-h-96 flex-1 flex-col items-center justify-center px-6 py-10 text-center">
+                        <div className="flex size-14 items-center justify-center rounded-2xl bg-sky-100 text-sky-700">
+                            <FileText className="size-7" aria-hidden="true" />
+                        </div>
+                        <h2 className="mt-4 text-lg font-semibold">Start a note</h2>
+                        <p className="mt-1.5 max-w-sm text-sm leading-6 text-muted-foreground">
                             Create a note page and start writing with blocks, slash commands,
                             and AI refinement.
                         </p>
 
-                        <Button className="mt-4" onClick={addNote}>
+                        <Button className="mt-5 rounded-lg" onClick={addNote}>
                             <Plus className="mr-2 size-4" aria-hidden="true" />
                             New Note
                         </Button>
@@ -1260,17 +1326,18 @@ function NoteRow({
                 type="button"
                 onClick={onSelect}
                 className={cn(
-                    "group relative flex w-full items-center gap-3 overflow-hidden rounded-lg p-3 text-left transition-colors",
+                    "group relative flex w-full items-center gap-3 overflow-hidden rounded-xl border p-2.5 pl-3.5 text-left shadow-sm transition-all duration-150",
                     selected
-                        ? colorStyles[note.color].active.replace("border-", "ring-1 ring-")
-                        : "hover:bg-muted/70"
+                        ? colorStyles[note.color].active
+                        : "border-border bg-card hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
                 )}
             >
                 <span className={cn("absolute inset-y-2 left-0 w-1 rounded-r-full", colorStyles[note.color].dot)} />
                 <span
                     className={cn(
                         "flex size-9 shrink-0 items-center justify-center rounded-lg",
-                        colorStyles[note.color].soft
+                        colorStyles[note.color].soft,
+                        colorStyles[note.color].text
                     )}
                 >
                     <Icon className="size-4" aria-hidden="true" />
@@ -1287,16 +1354,20 @@ function NoteRow({
                         )}
                     </span>
 
-                    <span className="mt-1 flex min-w-0 items-center gap-2 text-[11px] text-muted-foreground">
-                        <span className={cn("rounded-full px-1.5 py-0.5", colorStyles[note.color].chip)}>
-                            {colorStyles[note.color].label}
+                    {note.plainText.trim() && (
+                        <span className="mt-0.5 block truncate text-xs leading-5 text-muted-foreground">
+                            {note.plainText.trim()}
                         </span>
+                    )}
+
+                    <span className="mt-1 flex min-w-0 items-center gap-1.5 text-[11px] text-muted-foreground">
                         {note.category && (
-                            <span className="max-w-24 truncate rounded-full bg-primary/10 px-1.5 py-0.5 text-primary">
+                            <span className="max-w-24 shrink-0 truncate rounded-full bg-primary/10 px-1.5 py-0.5 font-medium text-primary">
                                 {note.category}
                             </span>
                         )}
                         <span className="truncate">{formatUpdatedAt(note.updatedAt)}</span>
+                        <span className="shrink-0 tabular-nums">· {note.wordCount}w</span>
                     </span>
                 </span>
 
@@ -1342,7 +1413,7 @@ function NoteRow({
             </button>
 
             {menuOpen && (
-                <div className="absolute right-1 top-11 z-30 w-60 rounded-lg bg-popover p-2 shadow-xl ring-1 ring-border/70">
+                <div className="absolute right-1 top-full z-30 mt-1 w-60 rounded-xl bg-popover p-2 shadow-xl ring-1 ring-border/70">
                     <p className="px-1 pb-1 text-[11px] font-medium uppercase text-muted-foreground">
                         Color
                     </p>
