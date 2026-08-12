@@ -6,9 +6,10 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import { db, users, whiteboards } from "@/db";
+import { assertAiFeatureEnabled, assertFreePlanLimit, recordAiAction } from "@/lib/user-preferences";
 
 const whiteboardColors = ["sage", "clay", "amber", "sky", "violet"] as const;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
+const GEMINI_MODEL = "gemini-2.5-flash";
 
 export type WhiteboardColor = (typeof whiteboardColors)[number];
 export type WhiteboardScene = Record<string, unknown>;
@@ -121,6 +122,7 @@ export async function listWhiteboards() {
 }
 
 export async function createWhiteboard(input?: { name?: string; color?: string }) {
+  await assertFreePlanLimit("whiteboards");
   const userId = await getCurrentDatabaseUserId();
   const existing = await db.query.whiteboards.findMany({
     where: eq(whiteboards.userId, userId),
@@ -259,6 +261,8 @@ function parseJsonResponse(text: string) {
 }
 
 export async function generateWhiteboardDiagram(prompt: string): Promise<GeneratedDiagram> {
+  await assertAiFeatureEnabled("aiDiagramEnabled");
+  await recordAiAction();
   await getCurrentDatabaseUserId();
   const cleanPrompt = prompt.trim().slice(0, 2000);
   if (!cleanPrompt) {
