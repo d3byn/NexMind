@@ -110,7 +110,7 @@ export function AppShell({ activePage, generatedSidebarApps = [], children }: Ap
                 collapsed && "pointer-events-none opacity-0",
               )}
             >
-              <p className="truncate text-[13px] font-semibold leading-5">Flowbase</p>
+              <p className="truncate text-[13px] font-semibold leading-5">NexMind</p>
               <p className="truncate text-xs text-muted-foreground">Cozy workspace</p>
             </div>
           </div>

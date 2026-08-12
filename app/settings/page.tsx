@@ -26,7 +26,7 @@ export default async function SettingsPage() {
             Settings
           </p>
           <div>
-            <h1 className="text-2xl font-semibold leading-tight text-foreground">Tune your Flowbase workspace.</h1>
+            <h1 className="text-2xl font-semibold leading-tight text-foreground">Tune your NexMind workspace.</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
               Manage profile, plan, categories, AI defaults, privacy, and the little preferences that make the app feel like yours.
             </p>

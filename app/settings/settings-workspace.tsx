@@ -179,7 +179,7 @@ export function SettingsWorkspace({ initialData }: { initialData: SettingsPageDa
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `flowbase-export-${new Date().toISOString().slice(0, 10)}.json`;
+        link.download = `nexmind-export-${new Date().toISOString().slice(0, 10)}.json`;
         link.click();
         URL.revokeObjectURL(url);
         setMessage("Data export prepared.");
@@ -240,7 +240,7 @@ export function SettingsWorkspace({ initialData }: { initialData: SettingsPageDa
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="truncate text-lg font-semibold">{user?.fullName || initialData.profile.name || "Flowbase user"}</p>
+                  <p className="truncate text-lg font-semibold">{user?.fullName || initialData.profile.name || "NexMind user"}</p>
                   <p className="truncate text-sm text-muted-foreground">{user?.primaryEmailAddress?.emailAddress || initialData.profile.email}</p>
                 </div>
               </div>
@@ -408,7 +408,7 @@ export function SettingsWorkspace({ initialData }: { initialData: SettingsPageDa
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="font-medium">Data export</p>
-                  <p className="mt-1 text-sm text-muted-foreground">Download your Flowbase data as JSON.</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Download your NexMind data as JSON.</p>
                 </div>
                 <Button variant="outline" className="rounded-lg bg-card" onClick={exportData} disabled={isPending}>
                   <Download className="mr-2 size-4" aria-hidden="true" />
@@ -427,7 +427,7 @@ export function SettingsWorkspace({ initialData }: { initialData: SettingsPageDa
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <ActionTile icon={KeyRound} title="Authentication" text="Profile, passwordless sign-in, connected accounts, and sessions are managed by Clerk." />
-              <ActionTile icon={Shield} title="User-scoped data" text="Settings and categories are saved to your signed-in Flowbase account." />
+              <ActionTile icon={Shield} title="User-scoped data" text="Settings and categories are saved to your signed-in NexMind account." />
             </div>
           </SettingsCard>
         )}
