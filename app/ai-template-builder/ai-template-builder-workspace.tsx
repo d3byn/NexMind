@@ -137,7 +137,7 @@ export function AiTemplateBuilderWorkspace({ initialApps }: AiTemplateBuilderWor
 
           {apps.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center">
-              <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--grape),hsl(244_74%_54%))] text-white shadow-md shadow-primary/25">
                 <Sparkles className="size-7" aria-hidden="true" />
               </div>
               <p className="mt-4 text-sm font-semibold">No generated apps yet</p>
@@ -219,7 +219,7 @@ export function AiTemplateBuilderWorkspace({ initialApps }: AiTemplateBuilderWor
         ) : (
           <div className="flex min-h-[32rem] items-center justify-center rounded-xl border border-dashed border-border bg-card p-8 text-center">
             <div>
-              <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--grape),hsl(244_74%_54%))] text-white shadow-md shadow-primary/25">
                 <Sparkles className="size-7" aria-hidden="true" />
               </div>
               <p className="mt-4 text-sm font-semibold">Generated preview appears here</p>

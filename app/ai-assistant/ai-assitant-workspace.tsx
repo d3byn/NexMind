@@ -172,7 +172,7 @@ export function AiAssistantWorkspace({ initialSnapshot }: { initialSnapshot: Ass
       >
         {!hasMessages ? (
           <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center gap-7 py-10 text-center">
-            <div className="flex size-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-md">
+            <div className="flex size-14 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--grape),hsl(244_74%_54%))] text-primary-foreground shadow-lg shadow-primary/30">
               <Bot className="size-7" aria-hidden="true" />
             </div>
             <div className="max-w-2xl">
@@ -317,7 +317,7 @@ export function AiAssistantWorkspace({ initialSnapshot }: { initialSnapshot: Ass
               {error}
             </div>
           ) : null}
-          <div className="rounded-2xl border border-border bg-card p-2 shadow-[0_8px_28px_rgba(70,54,40,0.08)] transition-colors focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/10">
+          <div className="rounded-2xl border border-border bg-card p-2 shadow-[0_8px_28px_rgba(39,39,87,0.10)] transition-colors focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/10">
             <textarea
               value={prompt}
               onChange={(event) => setPrompt(event.target.value)}
