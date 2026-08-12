@@ -63,7 +63,11 @@ function addMonths(date: Date, months: number) {
 
 function getMonthDays(anchor: Date) {
     const start = startOfWeek(new Date(anchor.getFullYear(), anchor.getMonth(), 1));
-    return Array.from({ length: 42 }, (_, index) => addDays(start, index));
+    const monthEnd = new Date(anchor.getFullYear(), anchor.getMonth() + 1, 0);
+    const end = addDays(startOfWeek(monthEnd), 6);
+    // Only render the weeks the month actually touches, so short months don't end on a dead row.
+    const weekCount = Math.round((end.getTime() - start.getTime()) / 86_400_000 / 7);
+    return Array.from({ length: weekCount * 7 }, (_, index) => addDays(start, index));
 }
 
 function getWeekDays(anchor: Date) {
@@ -111,6 +115,7 @@ export function CalendarBoard({ initialItems, categories }: { initialItems: Cale
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingItemId, setEditingItemId] = useState<number | null>(null);
     const [draggingId, setDraggingId] = useState<number | null>(null);
+    const [dragOverDate, setDragOverDate] = useState<string | null>(null);
     const [error, setError] = useState("");
     const [isPending, startTransition] = useTransition();
 
@@ -157,6 +162,11 @@ export function CalendarBoard({ initialItems, categories }: { initialItems: Cale
             const exists = current.some((item) => item.id === nextItem.id);
             return exists ? current.map((item) => (item.id === nextItem.id ? nextItem : item)) : [nextItem, ...current];
         });
+    }
+
+    function trackDrag(id: number | null) {
+        setDraggingId(id);
+        if (id === null) setDragOverDate(null);
     }
 
     function removeItem(id: number) {
@@ -213,6 +223,7 @@ export function CalendarBoard({ initialItems, categories }: { initialItems: Cale
     }
 
     function onDropItem(targetDate: string) {
+        setDragOverDate(null);
         if (!draggingId) return;
         const previous = items.find((item) => item.id === draggingId);
         if (!previous || previous.scheduledDate === targetDate) {
@@ -288,62 +299,101 @@ export function CalendarBoard({ initialItems, categories }: { initialItems: Cale
                 </CardHeader>
 
                 <CardContent className="p-0">
-                    <div className="grid grid-cols-7 border-y border-border bg-background text-center text-[11px] font-semibold uppercase leading-9 text-muted-foreground">
-                        {weekDays.map((day) => (
-                            <div key={day} className="min-w-0 border-r border-border last:border-r-0">
-                                {day}
+                    {/* The grid keeps a minimum width so cells stay square and legible instead of being squeezed; narrow screens scroll horizontally. */}
+                    <div className="overflow-x-auto border-t border-border bg-background/50">
+                        <div className="min-w-[46rem] p-3 sm:p-4">
+                            <div className="grid grid-cols-7 gap-1.5 pb-2 sm:gap-2">
+                                {weekDays.map((day, index) => (
+                                    <div
+                                        key={day}
+                                        className={cn(
+                                            "min-w-0 text-center text-[11px] font-semibold uppercase tracking-[0.08em]",
+                                            index === 0 || index === 6 ? "text-primary/70" : "text-muted-foreground",
+                                        )}
+                                    >
+                                        {day}
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                    <div className="grid grid-cols-7">
-                        {visibleDays.map((day) => {
-                            const key = dateKey(day);
-                            const dayItems = sortItems(itemsByDate[key] || []);
-                            const isToday = key === dateKey(today);
-                            const inCurrentMonth = day.getMonth() === anchorDate.getMonth();
+                            <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
+                                {visibleDays.map((day) => {
+                                    const key = dateKey(day);
+                                    const dayItems = sortItems(itemsByDate[key] || []);
+                                    const isToday = key === dateKey(today);
+                                    const inCurrentMonth = view === "week" || day.getMonth() === anchorDate.getMonth();
+                                    const isDropTarget = dragOverDate === key;
 
-                            return (
-                                <button
-                                    key={key}
-                                    type="button"
-                                    onClick={() => openDialog(key)}
-                                    onDragOver={(event) => event.preventDefault()}
-                                    onDrop={(event) => {
-                                        event.preventDefault();
-                                        onDropItem(key);
-                                    }}
-                                    className={cn(
-                                        "group flex min-h-32 min-w-0 flex-col border-b border-r border-border bg-card p-2 text-left transition-colors hover:bg-accent/45 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:min-h-36",
-                                        view === "week" && "min-h-[28rem]",
-                                        view === "month" && !inCurrentMonth && "bg-background/65 text-muted-foreground",
-                                    )}
-                                >
-                                    <div className="mb-2 flex items-center justify-between gap-2">
-                                        <span
+                                    return (
+                                        <button
+                                            key={key}
+                                            type="button"
+                                            onClick={() => openDialog(key)}
+                                            onDragOver={(event) => {
+                                                event.preventDefault();
+                                                setDragOverDate(key);
+                                            }}
+                                            onDragLeave={(event) => {
+                                                // dragleave also fires when the cursor moves onto a chip inside the cell, which would flicker the highlight.
+                                                if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
+                                                setDragOverDate((current) => (current === key ? null : current));
+                                            }}
+                                            onDrop={(event) => {
+                                                event.preventDefault();
+                                                onDropItem(key);
+                                            }}
                                             className={cn(
-                                                "flex size-7 items-center justify-center rounded-lg text-xs font-semibold",
-                                                isToday ? "bg-primary text-primary-foreground" : "text-foreground group-hover:bg-card",
+                                                "group flex min-w-0 flex-col rounded-xl border p-2 text-left transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
+                                                view === "month" ? "aspect-square" : "min-h-[26rem]",
+                                                inCurrentMonth
+                                                    ? "border-border bg-card shadow-sm hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+                                                    : "border-transparent bg-muted/40 opacity-70 hover:bg-muted/70 hover:opacity-100",
+                                                isToday && "border-primary bg-primary/[0.06] ring-1 ring-primary/25",
+                                                isDropTarget && "border-dashed border-primary bg-primary/10 ring-2 ring-primary/30",
                                             )}
                                         >
-                                            {day.getDate()}
-                                        </span>
-                                        <Plus className="size-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" aria-hidden="true" />
-                                    </div>
-                                    <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
-                                        {dayItems.map((item) => (
-                                            <TaskChip
-                                                key={item.id}
-                                                item={item}
-                                                categories={categoryOptions}
-                                                setDraggingId={setDraggingId}
-                                                onOpenEdit={() => openEditDialog(item)}
-                                                onDelete={() => deleteItem(item.id)}
-                                            />
-                                        ))}
-                                    </div>
-                                </button>
-                            );
-                        })}
+                                            <div className="mb-1.5 flex items-center justify-between gap-1">
+                                                <span
+                                                    className={cn(
+                                                        "flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold tabular-nums transition-colors",
+                                                        isToday
+                                                            ? "bg-primary text-primary-foreground shadow-sm"
+                                                            : inCurrentMonth
+                                                                ? "text-foreground group-hover:bg-accent/60"
+                                                                : "text-muted-foreground/60",
+                                                    )}
+                                                >
+                                                    {day.getDate()}
+                                                </span>
+                                                {dayItems.length > 0 && (
+                                                    <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-muted-foreground group-hover:hidden">
+                                                        {dayItems.length}
+                                                    </span>
+                                                )}
+                                                <Plus
+                                                    className={cn(
+                                                        "size-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100",
+                                                        dayItems.length > 0 && "hidden group-hover:block",
+                                                    )}
+                                                    aria-hidden="true"
+                                                />
+                                            </div>
+                                            <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                                                {dayItems.map((item) => (
+                                                    <TaskChip
+                                                        key={item.id}
+                                                        item={item}
+                                                        categories={categoryOptions}
+                                                        setDraggingId={trackDrag}
+                                                        onOpenEdit={() => openEditDialog(item)}
+                                                        onDelete={() => deleteItem(item.id)}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
                     </div>
                 </CardContent>
             </Card>
@@ -372,7 +422,7 @@ export function CalendarBoard({ initialItems, categories }: { initialItems: Cale
                                 key={item.id}
                                 item={item}
                                 categories={categoryOptions}
-                                setDraggingId={setDraggingId}
+                                setDraggingId={trackDrag}
                                 onDelete={() => deleteItem(item.id)}
                             />
                         ))
@@ -541,13 +591,12 @@ function TaskChip({
                 event.stopPropagation();
                 onOpenEdit();
             }}
-            className="group/chip relative min-w-0 cursor-grab rounded-md border border-l-4 bg-background px-2 py-1.5 text-xs shadow-sm active:cursor-grabbing"
-            style={{ borderLeftColor: style.color }}
+            className="group/chip relative min-w-0 cursor-grab rounded-md border border-l-[3px] px-1.5 py-1 text-[11px] leading-tight shadow-sm transition-shadow hover:shadow active:cursor-grabbing"
+            style={{ borderColor: `${style.color}40`, borderLeftColor: style.color, backgroundColor: `${style.color}14` }}
         >
-            <div className="flex min-w-0 items-center gap-1.5">
-                {item.itemType === "reminder" ? <Bell className="size-3 shrink-0 text-primary" /> : <GripVertical className="size-3 shrink-0 text-muted-foreground" />}
-                <span className="truncate font-medium">{item.title}</span>
-                {}
+            <div className="flex min-w-0 items-center gap-1">
+                {item.itemType === "reminder" && <Bell className="size-3 shrink-0 text-primary" aria-hidden="true" />}
+                <span className="truncate font-medium text-foreground">{item.title}</span>
                 <span
                     role="button"
                     tabIndex={0}
@@ -568,9 +617,9 @@ function TaskChip({
                 </span>
             </div>
             {(item.isAllDay || item.scheduledTime || item.itemType === "reminder") && (
-                <div className="mt-1 flex items-center gap-1 text-[10px] font-medium uppercase text-muted-foreground">
-                    {item.isAllDay ? <Sun className="size-3" aria-hidden="true" /> : item.scheduledTime ? <Clock className="size-3" aria-hidden="true" /> : null}
-                    <span>{item.isAllDay ? "All day" : item.scheduledTime || "Reminder"}</span>
+                <div className="mt-0.5 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    {item.isAllDay ? <Sun className="size-2.5" aria-hidden="true" /> : item.scheduledTime ? <Clock className="size-2.5" aria-hidden="true" /> : null}
+                    <span className="truncate">{item.isAllDay ? "All day" : item.scheduledTime || "Reminder"}</span>
                 </div>
             )}
         </div>
