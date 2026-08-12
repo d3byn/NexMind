@@ -172,8 +172,8 @@ export function AiAssistantWorkspace({ initialSnapshot }: { initialSnapshot: Ass
       >
         {!hasMessages ? (
           <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center gap-7 py-10 text-center">
-            <div className="flex size-12 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-              <Bot className="size-5" aria-hidden="true" />
+            <div className="flex size-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-md">
+              <Bot className="size-7" aria-hidden="true" />
             </div>
             <div className="max-w-2xl">
               <h2 className="text-3xl font-semibold leading-tight text-foreground">AI Assistant</h2>
@@ -189,9 +189,9 @@ export function AiAssistantWorkspace({ initialSnapshot }: { initialSnapshot: Ass
                     key={suggestion.text}
                     type="button"
                     onClick={() => sendPrompt(suggestion.text)}
-                    className="flex min-h-20 items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 text-left text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent"
+                    className="group flex min-h-20 items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-left text-sm font-medium text-foreground shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
                   >
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-primary">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                       <Icon className="size-4" aria-hidden="true" />
                     </span>
                     <span className="min-w-0 leading-5">{suggestion.text}</span>
@@ -199,10 +199,19 @@ export function AiAssistantWorkspace({ initialSnapshot }: { initialSnapshot: Ass
                 );
               })}
             </div>
-            <div className="grid w-full max-w-2xl grid-cols-3 gap-2 text-xs text-muted-foreground">
-              <span>{initialSnapshot.kanbanBoards.length} boards</span>
-              <span>{initialSnapshot.notes.length} notes</span>
-              <span>{initialSnapshot.calendarItems.length} calendar items</span>
+            <div className="flex flex-wrap items-center justify-center gap-1.5">
+              <span className="flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold tabular-nums text-muted-foreground">
+                <Columns3 className="size-3" aria-hidden="true" />
+                {initialSnapshot.kanbanBoards.length} boards
+              </span>
+              <span className="flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold tabular-nums text-muted-foreground">
+                <FileText className="size-3" aria-hidden="true" />
+                {initialSnapshot.notes.length} notes
+              </span>
+              <span className="flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold tabular-nums text-muted-foreground">
+                <CalendarDays className="size-3" aria-hidden="true" />
+                {initialSnapshot.calendarItems.length} calendar items
+              </span>
             </div>
           </div>
         ) : (
@@ -211,23 +220,34 @@ export function AiAssistantWorkspace({ initialSnapshot }: { initialSnapshot: Ass
               <div
                 key={message.id}
                 className={cn(
-                  "flex w-full",
+                  "flex w-full items-end gap-2.5",
                   message.role === "user" ? "justify-end" : "justify-start",
                 )}
               >
+                {message.role !== "user" && (
+                  <span
+                    className={cn(
+                      "flex size-8 shrink-0 items-center justify-center rounded-full shadow-sm",
+                      message.role === "system" ? "bg-muted text-muted-foreground" : "bg-primary text-primary-foreground",
+                    )}
+                    aria-hidden="true"
+                  >
+                    <Bot className="size-4" />
+                  </span>
+                )}
                 <div
                   className={cn(
-                    "max-w-[88%] rounded-lg border px-4 py-3 text-sm leading-6 shadow-sm sm:max-w-[75%]",
+                    "max-w-[88%] rounded-2xl border px-4 py-3 text-sm leading-6 shadow-sm sm:max-w-[75%]",
                     message.role === "user"
-                      ? "border-primary/20 bg-primary text-primary-foreground"
+                      ? "rounded-br-md border-primary/20 bg-primary text-primary-foreground"
                       : message.role === "system"
-                        ? "border-border bg-muted text-muted-foreground"
-                        : "border-border bg-card text-card-foreground",
+                        ? "rounded-bl-md border-border bg-muted text-muted-foreground"
+                        : "rounded-bl-md border-border bg-card text-card-foreground",
                   )}
                 >
                   <p className="whitespace-pre-wrap">{message.content}</p>
                   {message.action ? (
-                    <Card className="mt-3 rounded-lg border-border bg-background/80 p-3 shadow-none">
+                    <Card className="mt-3 rounded-xl border-l-4 border-border border-l-primary bg-background/80 p-3 shadow-none">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className={cn("rounded-md px-2 py-1 text-xs font-medium", actionTone(message.action.appArea))}>
                           {message.action.appArea}
@@ -276,8 +296,11 @@ export function AiAssistantWorkspace({ initialSnapshot }: { initialSnapshot: Ass
               </div>
             ))}
             {isPending ? (
-              <div className="flex justify-start">
-                <div className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm text-muted-foreground shadow-sm">
+              <div className="flex items-end justify-start gap-2.5">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm" aria-hidden="true">
+                  <Bot className="size-4" />
+                </span>
+                <div className="inline-flex items-center gap-2 rounded-2xl rounded-bl-md border border-border bg-card px-4 py-3 text-sm text-muted-foreground shadow-sm">
                   <Loader2 className="size-4 animate-spin" aria-hidden="true" />
                   Thinking
                 </div>
@@ -294,7 +317,7 @@ export function AiAssistantWorkspace({ initialSnapshot }: { initialSnapshot: Ass
               {error}
             </div>
           ) : null}
-          <div className="rounded-lg border border-border bg-card p-2 shadow-[0_8px_28px_rgba(70,54,40,0.08)]">
+          <div className="rounded-2xl border border-border bg-card p-2 shadow-[0_8px_28px_rgba(70,54,40,0.08)] transition-colors focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/10">
             <textarea
               value={prompt}
               onChange={(event) => setPrompt(event.target.value)}
