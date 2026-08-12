@@ -20,6 +20,7 @@ export type CalendarItemDTO = {
   category: CalendarCategory;
   scheduledDate: string | null;
   scheduledTime: string | null;
+  isAllDay: boolean;
   isDraft: boolean;
   createdAt: string;
   updatedAt: string;
@@ -32,6 +33,7 @@ export type CalendarItemInput = {
   category: string;
   scheduledDate?: string | null;
   scheduledTime?: string | null;
+  isAllDay?: boolean;
 };
 
 function normalizeType(value: string): CalendarItemType {
@@ -56,6 +58,7 @@ function toDTO(item: typeof calendarItems.$inferSelect): CalendarItemDTO {
     category: normalizeCategory(item.category),
     scheduledDate: item.scheduledDate,
     scheduledTime: item.scheduledTime,
+    isAllDay: item.isAllDay,
     isDraft: item.isDraft,
     createdAt: item.createdAt.toISOString(),
     updatedAt: item.updatedAt.toISOString(),
@@ -109,6 +112,8 @@ export async function createCalendarItem(input: CalendarItemInput, asDraft = fal
     throw new Error("Choose a date before scheduling this item.");
   }
 
+  const isAllDay = Boolean(input.isAllDay);
+
   const [item] = await db
     .insert(calendarItems)
     .values({
@@ -118,7 +123,8 @@ export async function createCalendarItem(input: CalendarItemInput, asDraft = fal
       itemType: normalizeType(input.itemType),
       category: normalizeCategory(input.category),
       scheduledDate,
-      scheduledTime: cleanOptionalText(input.scheduledTime),
+      scheduledTime: isAllDay ? null : cleanOptionalText(input.scheduledTime),
+      isAllDay,
       isDraft: asDraft,
       updatedAt: new Date(),
     })
@@ -142,6 +148,8 @@ export async function updateCalendarItem(id: number, input: CalendarItemInput, a
     throw new Error("Choose a date before scheduling this item.");
   }
 
+  const isAllDay = Boolean(input.isAllDay);
+
   const [item] = await db
     .update(calendarItems)
     .set({
@@ -150,7 +158,8 @@ export async function updateCalendarItem(id: number, input: CalendarItemInput, a
       itemType: normalizeType(input.itemType),
       category: normalizeCategory(input.category),
       scheduledDate,
-      scheduledTime: cleanOptionalText(input.scheduledTime),
+      scheduledTime: isAllDay ? null : cleanOptionalText(input.scheduledTime),
+      isAllDay,
       isDraft: asDraft,
       updatedAt: new Date(),
     })
@@ -163,6 +172,22 @@ export async function updateCalendarItem(id: number, input: CalendarItemInput, a
 
   revalidatePath("/calendar");
   return toDTO(item);
+}
+
+export async function deleteCalendarItem(id: number) {
+  const userId = await getCurrentDatabaseUserId();
+
+  const [item] = await db
+    .delete(calendarItems)
+    .where(and(eq(calendarItems.id, id), eq(calendarItems.userId, userId)))
+    .returning({ id: calendarItems.id });
+
+  if (!item) {
+    throw new Error("Calendar item not found.");
+  }
+
+  revalidatePath("/calendar");
+  return { id: item.id };
 }
 
 export async function scheduleCalendarItem(id: number, scheduledDate: string) {

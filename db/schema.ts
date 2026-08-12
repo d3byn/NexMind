@@ -20,6 +20,7 @@ export const calendarItems = pgTable("calendar_items", {
   category: text("category").notNull().default("work"),
   scheduledDate: text("scheduled_date"),
   scheduledTime: text("scheduled_time"),
+  isAllDay: boolean("is_all_day").notNull().default(false),
   isDraft: boolean("is_draft").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
