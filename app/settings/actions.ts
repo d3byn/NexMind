@@ -21,17 +21,17 @@ import {
 } from "@/lib/user-preferences";
 
 const defaultCategories: Array<{ scope: CategoryScope; name: string; color: string; icon: string }> = [
-  { scope: "calendar", name: "Work", color: "#5BAE91", icon: "BriefcaseBusiness" },
-  { scope: "calendar", name: "Personal", color: "#EF806F", icon: "Heart" },
-  { scope: "calendar", name: "Focus", color: "#4BA3C7", icon: "Focus" },
-  { scope: "calendar", name: "Meeting", color: "#E6A23C", icon: "Users" },
-  { scope: "reminder", name: "Reminder", color: "#8B7CF6", icon: "Bell" },
-  { scope: "task", name: "Build", color: "#E6A23C", icon: "Hammer" },
-  { scope: "task", name: "Review", color: "#4BA3C7", icon: "ListChecks" },
-  { scope: "task", name: "Admin", color: "#8B7CF6", icon: "ClipboardList" },
-  { scope: "note", name: "Ideas", color: "#EF806F", icon: "Lightbulb" },
-  { scope: "note", name: "Research", color: "#5BAE91", icon: "BookOpen" },
-  { scope: "note", name: "Meeting Notes", color: "#E6A23C", icon: "NotebookPen" },
+  { scope: "calendar", name: "Work", color: "#505081", icon: "BriefcaseBusiness" },
+  { scope: "calendar", name: "Personal", color: "#D6577A", icon: "Heart" },
+  { scope: "calendar", name: "Focus", color: "#4C7FD1", icon: "Focus" },
+  { scope: "calendar", name: "Meeting", color: "#D99A34", icon: "Users" },
+  { scope: "reminder", name: "Reminder", color: "#7C6BD4", icon: "Bell" },
+  { scope: "task", name: "Build", color: "#D99A34", icon: "Hammer" },
+  { scope: "task", name: "Review", color: "#4C7FD1", icon: "ListChecks" },
+  { scope: "task", name: "Admin", color: "#7C6BD4", icon: "ClipboardList" },
+  { scope: "note", name: "Ideas", color: "#D6577A", icon: "Lightbulb" },
+  { scope: "note", name: "Research", color: "#2F9E8F", icon: "BookOpen" },
+  { scope: "note", name: "Meeting Notes", color: "#D99A34", icon: "NotebookPen" },
 ];
 
 const themeOptions = ["system", "light", "dark"] as const;

@@ -22,7 +22,7 @@ export default async function SettingsPage() {
       <section className="mx-auto flex w-full max-w-[92rem] flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
         <header className="flex flex-col gap-3 border-b border-border pb-5">
           <p className="flex items-center gap-2 text-sm font-medium text-primary">
-            <Settings className="size-4 text-stone-500" aria-hidden="true" />
+            <Settings className="size-4 text-eclipse-500" aria-hidden="true" />
             Settings
           </p>
           <div>
