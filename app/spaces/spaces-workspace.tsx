@@ -544,7 +544,7 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
 
           {visibleSpaces.length === 0 && (
             <div className="mt-4 flex min-h-56 flex-col items-center justify-center rounded-xl border border-dashed border-border px-4 text-center">
-              <div className="flex size-14 items-center justify-center rounded-2xl bg-violet-100 text-violet-700">
+              <div className="flex size-14 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--grape),hsl(244_74%_54%))] text-white shadow-md shadow-primary/25">
                 <Folder className="size-7" aria-hidden="true" />
               </div>
               <h3 className="mt-4 text-base font-semibold">No spaces found</h3>
@@ -560,7 +560,7 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
 
       {selectedSpace && (
         <section className={cn("grid min-h-0 gap-5", selectedPage && "lg:grid-cols-[minmax(0,1fr)_19rem] xl:grid-cols-1 2xl:grid-cols-[minmax(0,1fr)_20rem]")}>
-          <div className="flex min-h-[42rem] min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-[hsl(42_82%_99%)] shadow-sm">
+          <div className="flex min-h-[42rem] min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-paper shadow-sm">
             {selectedSpace ? (
               <>
                 <span className={cn("h-1 w-full shrink-0", colorStyles[selectedSpace.color].dot)} aria-hidden="true" />
@@ -647,7 +647,7 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
                         </table>
                         {selectedSpace.pages.length === 0 && (
                           <div className="flex flex-col items-center justify-center px-4 py-14 text-center">
-                            <div className="flex size-12 items-center justify-center rounded-2xl bg-violet-100 text-violet-700">
+                            <div className="flex size-12 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--grape),hsl(244_74%_54%))] text-white shadow-md shadow-primary/25">
                               <FileText className="size-6" aria-hidden="true" />
                             </div>
                             <h3 className="mt-3.5 text-base font-semibold">No pages in this space</h3>
@@ -665,7 +665,7 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
                   {selectedPage && (
                     <div className="relative flex min-h-0 min-w-0 flex-col">
                       <>
-                        <div className="shrink-0 border-b border-border/70 bg-[hsl(42_82%_99%)]/95 px-4 py-3 backdrop-blur">
+                        <div className="shrink-0 border-b border-border/70 bg-paper/95 px-4 py-3 backdrop-blur">
                           <div className="flex flex-wrap items-center justify-between gap-3">
                             <div className="min-w-0 flex-1">
                               <input
@@ -1385,7 +1385,7 @@ function Toolbar({
 function EmptyEditor({ onNewPage }: { onNewPage: () => void }) {
   return (
     <div className="flex min-h-96 flex-1 flex-col items-center justify-center px-6 py-10 text-center">
-      <div className="flex size-14 items-center justify-center rounded-2xl bg-violet-100 text-violet-700">
+      <div className="flex size-14 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--grape),hsl(244_74%_54%))] text-white shadow-md shadow-primary/25">
         <BookOpen className="size-7" aria-hidden="true" />
       </div>
       <h2 className="mt-4 text-lg font-semibold">Open a space page</h2>
