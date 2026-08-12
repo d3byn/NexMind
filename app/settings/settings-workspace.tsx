@@ -529,18 +529,16 @@ function ToggleSetting({ label, checked, onChange }: { label: string; checked: b
       )}
     >
       <span className={cn("text-sm font-medium", !checked && "text-muted-foreground")}>{label}</span>
-      {/* The off-state track needs real contrast against the cream background, or the knob disappears into it. */}
+      {/* Flex + justify keeps the knob inside the track: an absolutely positioned knob could escape the pill. */}
       <span
         className={cn(
-          "relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200",
+          "inline-flex h-6 w-11 shrink-0 items-center justify-start rounded-full p-[3px] transition-colors duration-200",
           checked ? "bg-primary" : "bg-muted-foreground/30",
         )}
       >
+        {/* 3px pad + 18px knob + 20px travel = 41px, exactly the 44px track minus its right pad. */}
         <span
-          className={cn(
-            "absolute left-0.5 top-0.5 size-5 rounded-full bg-white shadow-sm ring-1 ring-black/5 transition-transform duration-200",
-            checked && "translate-x-5",
-          )}
+          className={cn("block size-[18px] rounded-full bg-white shadow transition-transform duration-200", checked && "translate-x-5")}
           aria-hidden="true"
         />
       </span>
