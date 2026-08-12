@@ -88,7 +88,26 @@ const iconMap: Record<string, LucideIcon> = {
   WandSparkles,
 };
 const iconOptions = Object.keys(iconMap);
-const colorOptions = ["#5BAE91", "#EF806F", "#E6A23C", "#4BA3C7", "#8B7CF6", "#94A3B8"];
+const colorOptions = [
+  "#5BAE91",
+  "#2F8F6E",
+  "#14B8A6",
+  "#4BA3C7",
+  "#2563EB",
+  "#6366F1",
+  "#8B7CF6",
+  "#A855F7",
+  "#EC6A9C",
+  "#E11D48",
+  "#EF806F",
+  "#DC2626",
+  "#F97316",
+  "#E6A23C",
+  "#EAB308",
+  "#84CC16",
+  "#94A3B8",
+  "#475569",
+];
 const proPlanId = process.env.NEXT_PUBLIC_CLERK_PRO_PLAN_ID;
 
 const emptyCategoryForm: CategoryInput = {
@@ -199,20 +218,25 @@ export function SettingsWorkspace({ initialData }: { initialData: SettingsPageDa
 
   return (
     <div className="grid min-w-0 gap-5 lg:grid-cols-[15rem_minmax(0,1fr)]">
-      <aside className="h-fit rounded-lg border border-border bg-card p-2 shadow-sm">
+      <aside className="h-fit rounded-xl border border-border bg-card p-2 shadow-sm">
         <nav className="grid gap-1" aria-label="Settings sections">
           {sections.map((section) => {
             const Icon = section.icon;
+            const isActive = active === section.id;
             return (
               <button
                 key={section.id}
                 type="button"
                 onClick={() => setActive(section.id)}
                 className={cn(
-                  "flex h-10 min-w-0 items-center gap-2 rounded-lg px-3 text-left text-sm font-medium transition-colors",
-                  active === section.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                  "relative flex h-10 min-w-0 items-center gap-2.5 rounded-lg pl-3.5 pr-3 text-left text-sm font-medium transition-colors",
+                  isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-accent hover:text-foreground",
                 )}
               >
+                <span
+                  className={cn("absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-primary transition-opacity", isActive ? "opacity-100" : "opacity-0")}
+                  aria-hidden="true"
+                />
                 <Icon className="size-4 shrink-0" aria-hidden="true" />
                 <span className="truncate">{section.label}</span>
               </button>
@@ -223,7 +247,13 @@ export function SettingsWorkspace({ initialData }: { initialData: SettingsPageDa
 
       <div className="min-w-0 space-y-5">
         {(message || error) && (
-          <div className={cn("rounded-lg border px-3 py-2 text-sm", error ? "border-clay-200 bg-clay-100 text-clay-800" : "border-sage-200 bg-sage-100 text-sage-800")}>
+          <div
+            className={cn(
+              "flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm",
+              error ? "border-clay-200 bg-clay-100 text-clay-800" : "border-sage-200 bg-sage-100 text-sage-800",
+            )}
+          >
+            {error ? <Shield className="size-4 shrink-0" aria-hidden="true" /> : <Check className="size-4 shrink-0" aria-hidden="true" />}
             {error || message}
           </div>
         )}
@@ -233,14 +263,14 @@ export function SettingsWorkspace({ initialData }: { initialData: SettingsPageDa
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex min-w-0 items-center gap-4">
                 {user?.imageUrl ? (
-                  <img src={user.imageUrl} alt="" className="size-16 rounded-lg object-cover" />
+                  <img src={user.imageUrl} alt="" className="size-11 shrink-0 rounded-full border border-border object-cover" />
                 ) : (
-                  <div className="flex size-16 items-center justify-center rounded-lg bg-sage-100 text-lg font-semibold text-sage-700">
+                  <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-sage-100 text-sm font-semibold text-sage-700">
                     {initialData.profile.initials}
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="truncate text-lg font-semibold">{user?.fullName || initialData.profile.name || "NexMind user"}</p>
+                  <p className="truncate text-base font-semibold">{user?.fullName || initialData.profile.name || "NexMind user"}</p>
                   <p className="truncate text-sm text-muted-foreground">{user?.primaryEmailAddress?.emailAddress || initialData.profile.email}</p>
                 </div>
               </div>
@@ -259,10 +289,10 @@ export function SettingsWorkspace({ initialData }: { initialData: SettingsPageDa
         {active === "subscription" && (
           <SettingsCard title="Subscription" icon={Sparkles}>
             <div className="grid gap-4 xl:grid-cols-[1fr_0.85fr]">
-              <div className="rounded-lg border border-border bg-background p-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-lg bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">{planName}</span>
-                  <span className="rounded-lg bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">{String(status)}</span>
+              <div className="rounded-xl border border-border bg-background p-4">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary">{planName}</span>
+                  <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold capitalize text-muted-foreground">{String(status)}</span>
                 </div>
                 <p className="mt-4 text-2xl font-semibold">{initialData.isPro ? "All access enabled" : "Free workspace"}</p>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -288,7 +318,7 @@ export function SettingsWorkspace({ initialData }: { initialData: SettingsPageDa
 
         {active === "categories" && (
           <SettingsCard title="Dynamic Categories" icon={Tag}>
-            <form className="grid gap-3 rounded-lg border border-border bg-background p-4 md:grid-cols-[1fr_1fr_auto]" onSubmit={submitCategory}>
+            <form className="grid gap-3 rounded-xl border border-border bg-background p-4 md:grid-cols-[1fr_1fr_auto]" onSubmit={submitCategory}>
               <label className="text-sm font-medium">
                 Scope
                 <select
@@ -319,21 +349,43 @@ export function SettingsWorkspace({ initialData }: { initialData: SettingsPageDa
               <div className="md:col-span-3 grid gap-3 lg:grid-cols-[1fr_1fr]">
                 <div>
                   <p className="text-sm font-medium">Color</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <div className="mt-2 flex flex-wrap gap-1.5">
                     {colorOptions.map((color) => (
-                      <button key={color} type="button" onClick={() => setCategoryForm((current) => ({ ...current, color }))} className={cn("flex size-9 items-center justify-center rounded-lg border", categoryForm.color === color ? "border-foreground" : "border-border")} aria-label={color} title={color}>
-                        <span className="size-4 rounded-full" style={{ backgroundColor: color }} />
-                      </button>
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => setCategoryForm((current) => ({ ...current, color }))}
+                        className={cn(
+                          "size-7 rounded-full ring-offset-2 ring-offset-background transition-transform hover:scale-110",
+                          categoryForm.color === color && "ring-2 ring-foreground",
+                        )}
+                        style={{ backgroundColor: color }}
+                        aria-label={color}
+                        aria-pressed={categoryForm.color === color}
+                        title={color}
+                      />
                     ))}
                   </div>
                 </div>
                 <div>
                   <p className="text-sm font-medium">Icon</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <div className="mt-2 flex flex-wrap gap-1.5">
                     {iconOptions.map((icon) => {
                       const Icon = iconMap[icon];
+                      const isActive = categoryForm.icon === icon;
                       return (
-                        <button key={icon} type="button" onClick={() => setCategoryForm((current) => ({ ...current, icon }))} className={cn("flex size-9 items-center justify-center rounded-lg border", categoryForm.icon === icon ? "border-foreground bg-muted" : "border-border hover:bg-muted")} aria-label={icon} title={icon}>
+                        <button
+                          key={icon}
+                          type="button"
+                          onClick={() => setCategoryForm((current) => ({ ...current, icon }))}
+                          className={cn(
+                            "flex size-8 items-center justify-center rounded-lg border transition-colors",
+                            isActive ? "border-foreground bg-muted text-foreground" : "border-border text-muted-foreground hover:bg-muted hover:text-foreground",
+                          )}
+                          aria-label={icon}
+                          aria-pressed={isActive}
+                          title={icon}
+                        >
                           <Icon className="size-4" aria-hidden="true" />
                         </button>
                       );
@@ -348,7 +400,7 @@ export function SettingsWorkspace({ initialData }: { initialData: SettingsPageDa
                 const meta = categoryScopeMeta[scope];
                 const ScopeIcon = meta.icon;
                 return (
-                  <div key={scope} className="rounded-lg border border-border bg-background p-4">
+                  <div key={scope} className="rounded-xl border border-border bg-background p-4">
                     <div className="flex items-start gap-3">
                       <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-card text-primary">
                         <ScopeIcon className="size-4" aria-hidden="true" />
@@ -404,7 +456,7 @@ export function SettingsWorkspace({ initialData }: { initialData: SettingsPageDa
               <ToggleSetting label="In-app notifications" checked={settings.notificationsEnabled} onChange={(notificationsEnabled) => saveSettings({ notificationsEnabled })} />
               <ToggleSetting label="Email notifications" checked={settings.emailNotificationsEnabled} onChange={(emailNotificationsEnabled) => saveSettings({ emailNotificationsEnabled })} />
             </div>
-            <div className="mt-5 rounded-lg border border-border bg-background p-4">
+            <div className="mt-5 rounded-xl border border-border bg-background p-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="font-medium">Data export</p>
@@ -438,23 +490,27 @@ export function SettingsWorkspace({ initialData }: { initialData: SettingsPageDa
 
 function SettingsCard({ title, icon: Icon, children }: { title: string; icon: LucideIcon; children: ReactNode }) {
   return (
-    <Card className="min-w-0 rounded-lg border-border bg-card shadow-sm">
-      <CardHeader className="p-5 pb-3">
-        <CardTitle className="flex min-w-0 items-center gap-2 text-base">
-          <Icon className="size-4 shrink-0 text-primary" aria-hidden="true" />
+    <Card className="min-w-0 overflow-hidden rounded-xl border-border bg-card shadow-sm">
+      <CardHeader className="border-b border-border p-5">
+        <CardTitle className="flex min-w-0 items-center gap-2.5 text-base">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Icon className="size-4" aria-hidden="true" />
+          </span>
           <span className="truncate">{title}</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-5 pt-0">{children}</CardContent>
+      <CardContent className="p-5">{children}</CardContent>
     </Card>
   );
 }
 
 function ActionTile({ icon: Icon, title, text }: { icon: LucideIcon; title: string; text: string }) {
   return (
-    <div className="rounded-lg border border-border bg-background p-4">
-      <Icon className="size-4 text-primary" aria-hidden="true" />
-      <p className="mt-3 text-sm font-medium">{title}</p>
+    <div className="rounded-xl border border-border bg-background p-4 transition-colors hover:border-primary/30">
+      <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <Icon className="size-4" aria-hidden="true" />
+      </span>
+      <p className="mt-3 text-sm font-semibold">{title}</p>
       <p className="mt-1 text-sm leading-6 text-muted-foreground">{text}</p>
     </div>
   );
@@ -462,10 +518,31 @@ function ActionTile({ icon: Icon, title, text }: { icon: LucideIcon; title: stri
 
 function ToggleSetting({ label, checked, onChange }: { label: string; checked: boolean; onChange: (checked: boolean) => void }) {
   return (
-    <button type="button" onClick={() => onChange(!checked)} className="flex min-h-12 items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2 text-left">
-      <span className="text-sm font-medium">{label}</span>
-      <span className={cn("flex h-6 w-11 items-center rounded-full p-0.5 transition-colors", checked ? "bg-primary" : "bg-muted")}>
-        <span className={cn("size-5 rounded-full bg-card shadow-sm transition-transform", checked && "translate-x-5")} />
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className={cn(
+        "flex min-h-12 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        checked ? "border-primary/30 bg-primary/[0.06]" : "border-border bg-background hover:border-primary/20",
+      )}
+    >
+      <span className={cn("text-sm font-medium", !checked && "text-muted-foreground")}>{label}</span>
+      {/* The off-state track needs real contrast against the cream background, or the knob disappears into it. */}
+      <span
+        className={cn(
+          "relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200",
+          checked ? "bg-primary" : "bg-muted-foreground/30",
+        )}
+      >
+        <span
+          className={cn(
+            "absolute left-0.5 top-0.5 size-5 rounded-full bg-white shadow-sm ring-1 ring-black/5 transition-transform duration-200",
+            checked && "translate-x-5",
+          )}
+          aria-hidden="true"
+        />
       </span>
     </button>
   );
@@ -473,7 +550,7 @@ function ToggleSetting({ label, checked, onChange }: { label: string; checked: b
 
 function SelectSetting({ label, value, options, onChange, icon: Icon }: { label: string; value: string; options: string[]; onChange: (value: string) => void; icon?: LucideIcon }) {
   return (
-    <label className="block rounded-lg border border-border bg-background p-3 text-sm font-medium">
+    <label className="block rounded-xl border border-border bg-background p-3 text-sm font-medium transition-colors focus-within:border-primary/30">
       <span className="flex items-center gap-2">
         {Icon ? <Icon className="size-4 text-primary" aria-hidden="true" /> : null}
         {label}
@@ -492,20 +569,19 @@ function SelectSetting({ label, value, options, onChange, icon: Icon }: { label:
 function CategoryRow({ category, onEdit, onDelete }: { category: UserCategoryDTO; onEdit: () => void; onDelete: () => void }) {
   const Icon = iconMap[category.icon] || Tag;
   return (
-    <div className="flex min-w-0 items-center gap-3 rounded-lg border border-border bg-card p-2.5">
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-lg text-white" style={{ backgroundColor: category.color }}>
-        <Icon className="size-4" aria-hidden="true" />
+    <div className="group flex min-w-0 items-center gap-2.5 rounded-lg border border-border bg-card py-1.5 pl-2.5 pr-1.5 transition-colors hover:border-primary/30">
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-md text-white" style={{ backgroundColor: category.color }}>
+        <Icon className="size-3.5" aria-hidden="true" />
       </span>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{category.name}</p>
-        <p className="text-xs text-muted-foreground">{category.color}</p>
+      <p className="min-w-0 flex-1 truncate text-sm font-medium">{category.name}</p>
+      <div className="flex shrink-0 items-center opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
+        <Button type="button" variant="ghost" size="icon" className="size-7 rounded-md" onClick={onEdit} aria-label={`Edit ${category.name}`}>
+          <Edit3 className="size-3.5" aria-hidden="true" />
+        </Button>
+        <Button type="button" variant="ghost" size="icon" className="size-7 rounded-md text-muted-foreground hover:text-destructive" onClick={onDelete} aria-label={`Delete ${category.name}`}>
+          <Trash2 className="size-3.5" aria-hidden="true" />
+        </Button>
       </div>
-      <Button type="button" variant="ghost" size="icon" className="size-8 rounded-lg" onClick={onEdit} aria-label={`Edit ${category.name}`}>
-        <Edit3 className="size-4" aria-hidden="true" />
-      </Button>
-      <Button type="button" variant="ghost" size="icon" className="size-8 rounded-lg text-muted-foreground hover:text-destructive" onClick={onDelete} aria-label={`Delete ${category.name}`}>
-        <Trash2 className="size-4" aria-hidden="true" />
-      </Button>
     </div>
   );
 }
@@ -521,19 +597,21 @@ function UsagePanel({ data }: { data: SettingsPageData }) {
   ] as const;
 
   return (
-    <div className="rounded-lg border border-border bg-background p-4">
-      <p className="font-medium">Free plan limits</p>
-      <div className="mt-3 space-y-2">
+    <div className="rounded-xl border border-border bg-background p-4">
+      <p className="font-semibold">{data.isPro ? "Plan usage" : "Free plan limits"}</p>
+      <div className="mt-3 space-y-2.5">
         {usageRows.map(([label, value, limit]) => {
           const percent = data.isPro ? 100 : Math.min(100, Math.round((value / limit) * 100));
+          // Near-limit bars shift colour so a nearly-full quota is visible without reading the numbers.
+          const bar = data.isPro || percent < 70 ? "bg-sage-600" : percent < 90 ? "bg-amber-600" : "bg-clay-600";
           return (
             <div key={label}>
               <div className="flex items-center justify-between gap-2 text-xs">
                 <span className="font-medium">{label}</span>
-                <span className="text-muted-foreground">{data.isPro ? `${value} / Unlimited` : `${value} / ${limit}`}</span>
+                <span className="tabular-nums text-muted-foreground">{data.isPro ? `${value} / Unlimited` : `${value} / ${limit}`}</span>
               </div>
               <div className="mt-1 h-2 overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full bg-primary" style={{ width: `${percent}%` }} />
+                <div className={cn("h-full rounded-full transition-all duration-300", bar)} style={{ width: `${percent}%` }} />
               </div>
             </div>
           );
