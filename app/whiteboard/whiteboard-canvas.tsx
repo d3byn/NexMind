@@ -25,7 +25,7 @@ export function WhiteboardCanvas({ board, onApi, onChange, onAddStickyNote, onOp
             initialData={{
                 elements: Array.isArray(board.scene.elements) ? board.scene.elements : [],
                 appState: {
-                    viewBackgroundColor: "#fffdf8",
+                    viewBackgroundColor: "#FAFAFE",
                     ...(typeof board.scene.appState === "object" && board.scene.appState ? board.scene.appState : {}),
                 },
                 files: board.files as BinaryFiles,

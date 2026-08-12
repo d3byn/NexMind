@@ -51,7 +51,7 @@ const boardStyles: Record<WhiteboardColor, { label: string; dot: string; ring: s
 };
 
 const stickyNoteFileId = "flowbase-sticky-note-template" as FileId;
-const defaultTextColor = "#111827";
+const defaultTextColor = "#0F0E47";
 let stickyNoteFilePromise: Promise<BinaryFileData> | null = null;
 
 type SaveStatus = "saved" | "saving" | "error";
@@ -153,7 +153,7 @@ function layoutDiagram(diagram: GeneratedDiagram, originX: number, originY: numb
       y: originY - 92,
       text: diagram.title,
       fontSize: 28,
-      strokeColor: "#1f2937",
+      strokeColor: "#0F0E47",
       backgroundColor: "transparent",
     },
   ];
@@ -187,8 +187,8 @@ function layoutDiagram(diagram: GeneratedDiagram, originX: number, originY: numb
         y: originY - 28,
         width: 270,
         height,
-        strokeColor: "#94a3b8",
-        backgroundColor: "#f8fafc",
+        strokeColor: "#8686AC",
+        backgroundColor: "#F4F4FB",
         fillStyle: "solid",
         roughness: 1,
         strokeStyle: "dashed",
@@ -199,7 +199,7 @@ function layoutDiagram(diagram: GeneratedDiagram, originX: number, originY: numb
         y: originY - 8,
         text: group,
         fontSize: 17,
-        strokeColor: "#334155",
+        strokeColor: "#272757",
         backgroundColor: "transparent",
       });
       groupNodes.forEach((node, nodeIndex) => {
@@ -227,8 +227,8 @@ function layoutDiagram(diagram: GeneratedDiagram, originX: number, originY: numb
       y: position.y,
       width: position.width,
       height: position.height,
-      strokeColor: "#334155",
-      backgroundColor: diagram.kind === "mindmap" && node === diagram.nodes[0] ? "#c7f0db" : "#ffffff",
+      strokeColor: "#272757",
+      backgroundColor: diagram.kind === "mindmap" && node === diagram.nodes[0] ? "#E4E4F3" : "#ffffff",
       fillStyle: "solid",
       roundness: { type: 3 },
       groupIds: [groupId],
@@ -240,7 +240,7 @@ function layoutDiagram(diagram: GeneratedDiagram, originX: number, originY: numb
       width: position.width - 36,
       text: node.detail ? `${node.label}\n${node.detail}` : node.label,
       fontSize: node.detail ? 16 : 18,
-      strokeColor: "#111827",
+      strokeColor: "#0F0E47",
       backgroundColor: "transparent",
       groupIds: [groupId],
     });
@@ -264,9 +264,9 @@ function layoutDiagram(diagram: GeneratedDiagram, originX: number, originY: numb
         [0, 0],
         [endX - startX, endY - startY],
       ],
-      strokeColor: "#475569",
+      strokeColor: "#505081",
       endArrowhead: "arrow",
-      label: edge.label ? { text: edge.label, fontSize: 14, strokeColor: "#475569" } : undefined,
+      label: edge.label ? { text: edge.label, fontSize: 14, strokeColor: "#505081" } : undefined,
     });
   }
 
@@ -427,7 +427,7 @@ export function WhiteboardWorkspace({ initialBoards }: { initialBoards: Whiteboa
         ...apiRef.current.getAppState(),
         exportWithDarkMode: false,
         exportBackground: true,
-        viewBackgroundColor: apiRef.current.getAppState().viewBackgroundColor || "#fffdf8",
+        viewBackgroundColor: apiRef.current.getAppState().viewBackgroundColor || "#FAFAFE",
       },
       files: apiRef.current.getFiles(),
       mimeType: "image/png",
@@ -474,7 +474,7 @@ export function WhiteboardWorkspace({ initialBoards }: { initialBoards: Whiteboa
   if (!selectedBoard) {
     return (
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-6 text-center">
-        <div className="flex size-14 items-center justify-center rounded-2xl bg-clay-100 text-clay-700">
+        <div className="flex size-14 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--blush),hsl(348_80%_55%))] text-white shadow-md shadow-clay-400/30">
           <StickyNote className="size-7" aria-hidden="true" />
         </div>
         <h2 className="mt-4 text-lg font-semibold">No whiteboards yet</h2>

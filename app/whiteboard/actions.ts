@@ -139,7 +139,7 @@ export async function createWhiteboard(input?: { name?: string; color?: string }
       scene: {
         elements: [],
         appState: {
-          viewBackgroundColor: "#fffdf8",
+          viewBackgroundColor: "#FAFAFE",
         },
       },
       files: {},
