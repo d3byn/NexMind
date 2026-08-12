@@ -62,7 +62,7 @@ const navGroups: NavGroup[] = [
     label: "Build",
     items: [
       { label: "AI Template Builder", href: "/ai-template-builder", icon: LayoutTemplate, color: "text-rose-500" },
-      { label: "Settings", href: "/settings", icon: Settings, color: "text-stone-500" },
+      { label: "Settings", href: "/settings", icon: Settings, color: "text-eclipse-500" },
     ],
   },
 ];
@@ -92,16 +92,17 @@ export function AppShell({ activePage, generatedSidebarApps = [], children }: Ap
   }
 
   return (
-    <div className="h-screen bg-background text-foreground">
+    // Two soft colour washes give the flat background some depth without touching contrast on cards.
+    <div className="h-screen bg-background bg-[radial-gradient(1100px_560px_at_8%_-8%,hsl(254_92%_92%/.85),transparent_60%),radial-gradient(900px_500px_at_100%_4%,hsl(190_92%_90%/.6),transparent_55%)] text-foreground">
       <div className="flex h-screen overflow-hidden">
         <aside
           className={cn(
-            "flex h-screen max-h-screen shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar px-2.5 py-3.5 shadow-[1px_0_24px_rgba(70,54,40,0.05)] transition-[width] duration-300 ease-out",
+            "flex h-screen max-h-screen shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar px-2.5 py-3.5 shadow-[1px_0_24px_rgba(39,39,87,0.06)] transition-[width] duration-300 ease-out",
             collapsed ? "w-[4.5rem]" : "w-64 max-sm:w-[4.5rem]",
           )}
         >
           <div className="flex h-11 items-center gap-2.5">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(135deg,var(--grape),hsl(244_74%_54%)_55%,var(--eclipse-900))] text-primary-foreground shadow-md shadow-primary/30">
               <Sparkles className="size-4" aria-hidden="true" />
             </div>
             <div
@@ -173,14 +174,20 @@ export function AppShell({ activePage, generatedSidebarApps = [], children }: Ap
                       aria-label={item.label}
                       title={collapsed ? item.label : undefined}
                       className={cn(
-                        "group flex h-9 items-center rounded-lg px-2.5 text-[13px] font-medium transition-colors",
+                        "group relative flex h-9 items-center rounded-lg px-2.5 text-[13px] font-medium transition-all duration-150",
                         collapsed ? "justify-center" : "gap-2.5 max-sm:justify-center",
                         active
-                          ? "bg-primary/10 text-primary shadow-[inset_0_0_0_1px_rgba(255,112,87,0.16)]"
-                          : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                          ? "bg-[linear-gradient(90deg,hsl(252_88%_94%),hsl(252_88%_94%/.35))] font-semibold text-primary shadow-sm"
+                          : "text-muted-foreground hover:translate-x-0.5 hover:bg-accent hover:text-foreground",
                       )}
                     >
-                      <Icon className={cn("size-4 shrink-0", item.color)} aria-hidden="true" />
+                      {active && (
+                        <span
+                          className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-[linear-gradient(180deg,var(--grape),hsl(244_74%_54%))]"
+                          aria-hidden="true"
+                        />
+                      )}
+                      <Icon className={cn("size-4 shrink-0 transition-transform duration-150 group-hover:scale-110", item.color)} aria-hidden="true" />
                       <span
                         className={cn(
                           "min-w-0 truncate transition-[opacity,width] duration-200",
