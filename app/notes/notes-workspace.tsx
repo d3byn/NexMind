@@ -1003,11 +1003,11 @@ export function NotesWorkspace({
                 </div>
             </aside>
 
-            <main className="relative flex min-h-[40rem] min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-[hsl(42_82%_99%)] shadow-sm lg:min-h-0">
+            <main className="relative flex min-h-[40rem] min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-paper shadow-sm lg:min-h-0">
                 {selectedNote ? (
                     <>
                         <span className={cn("h-1 w-full shrink-0", colorStyles[selectedNote.color].dot)} aria-hidden="true" />
-                        <div className="sticky top-0 z-10 shrink-0 border-b border-border bg-[hsl(42_82%_99%)]/95 px-3 py-3 backdrop-blur-xl sm:px-5">
+                        <div className="sticky top-0 z-10 shrink-0 border-b border-border bg-paper/95 px-3 py-3 backdrop-blur-xl sm:px-5">
                             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                                 <div className="flex min-w-0 items-center gap-3">
                                     <div
@@ -1271,7 +1271,7 @@ export function NotesWorkspace({
                     </>
                 ) : (
                     <div className="flex min-h-96 flex-1 flex-col items-center justify-center px-6 py-10 text-center">
-                        <div className="flex size-14 items-center justify-center rounded-2xl bg-sky-100 text-sky-700">
+                        <div className="flex size-14 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--aqua),hsl(214_90%_58%))] text-white shadow-md shadow-sky-500/25">
                             <FileText className="size-7" aria-hidden="true" />
                         </div>
                         <h2 className="mt-4 text-lg font-semibold">Start a note</h2>
