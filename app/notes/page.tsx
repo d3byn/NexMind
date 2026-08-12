@@ -1,5 +1,4 @@
 import { currentUser } from "@clerk/nextjs/server";
-import { FileText } from "lucide-react";
 import { redirect } from "next/navigation";
 
 import { listSidebarGeneratedApps } from "@/app/ai-template-builder/actions";
@@ -8,41 +7,41 @@ import { NotesWorkspace } from "@/app/notes/notes-workspace";
 import { listCategoriesForScopes } from "@/app/settings/actions";
 import { AppShell } from "@/components/app-shell";
 import { syncCurrentUserToDatabase } from "@/lib/sync-user";
+import { PageIcon } from "@/components/page-icon";
+import { pageIcons } from "@/lib/page-icons";
 
 export default async function NotesPage() {
-  const user = await currentUser();
-  if (!user) {
-    redirect("/sign-in");
-  }
+    const user = await currentUser();
+    if (!user) {
+        redirect("/sign-in");
+    }
 
-  await syncCurrentUserToDatabase();
-  const [notes, sidebarApps, categories] = await Promise.all([
-    listNotes(),
-    listSidebarGeneratedApps(),
-    listCategoriesForScopes(["note"]),
-  ]);
+    await syncCurrentUserToDatabase();
+    const [notes, sidebarApps, categories] = await Promise.all([
+        listNotes(),
+        listSidebarGeneratedApps(),
+        listCategoriesForScopes(["note"]),
+    ]);
 
 
 
-  return (
-    <AppShell activePage="notes" generatedSidebarApps={sidebarApps}>
-      <section className="mx-auto flex h-screen max-h-screen w-full max-w-[100rem] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <header className="shrink-0 px-1 py-1">
-          <div className="flex items-center gap-3">
-            <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(135deg,var(--aqua),hsl(214_90%_58%))] text-white shadow-md shadow-sky-500/25">
-              <FileText className="size-5" aria-hidden="true" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase leading-5 text-primary">Notes</p>
-              <h1 className="truncate text-2xl font-semibold leading-tight text-foreground">
-                Capture the shape of your thinking.
-              </h1>
-            </div>
-          </div>
-        </header>
+    return (
+        <AppShell activePage="notes" generatedSidebarApps={sidebarApps}>
+            <section className="mx-auto flex h-screen max-h-screen w-full max-w-[100rem] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
+                <header className="shrink-0 px-1 py-1">
+                    <div className="flex items-center gap-3">
+                        <PageIcon icon={pageIcons["notes"].icon} gradient={pageIcons["notes"].gradient} glow={pageIcons["notes"].glow} />
+                        <div className="min-w-0">
+                            <p className="text-xs font-semibold uppercase leading-5 text-primary">Notes</p>
+                            <h1 className="truncate text-2xl font-semibold leading-tight text-foreground">
+                                Capture the shape of your thinking.
+                            </h1>
+                        </div>
+                    </div>
+                </header>
 
-        <NotesWorkspace initialNotes={notes} categories={categories} />
-      </section>
-    </AppShell>
-  );
+                <NotesWorkspace initialNotes={notes} categories={categories} />
+            </section>
+        </AppShell>
+    );
 }

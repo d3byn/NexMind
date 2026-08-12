@@ -235,6 +235,32 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
     [selectedPageId, selectedSpace],
   );
 
+  /*
+   * The title input used to fire updatePage() on every keystroke, and each call replaced the
+   * whole spaces dataset in state — so typing re-rendered the entire page, editor included.
+   * Keep a local draft and write once the user pauses.
+   */
+  const [titleDraft, setTitleDraft] = useState(selectedPage?.title ?? "");
+  const [titleDraftPageId, setTitleDraftPageId] = useState(selectedPage?.id ?? null);
+  const titleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  if (selectedPage && selectedPage.id !== titleDraftPageId) {
+    setTitleDraftPageId(selectedPage.id);
+    setTitleDraft(selectedPage.title);
+  }
+
+  function saveTitle(value: string) {
+    if (!selectedPage || selectedPage.isArchived) return;
+
+    setTitleDraft(value);
+    if (titleTimer.current) clearTimeout(titleTimer.current);
+
+    const pageId = selectedPage.id;
+    titleTimer.current = setTimeout(() => {
+      runMutation(() => updatePage(pageId, { title: value }));
+    }, 600);
+  }
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -669,8 +695,8 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
                           <div className="flex flex-wrap items-center justify-between gap-3">
                             <div className="min-w-0 flex-1">
                               <input
-                                value={selectedPage.title}
-                                onChange={(event) => runMutation(() => updatePage(selectedPage.id, { title: event.target.value }))}
+                                value={titleDraft}
+                                onChange={(event) => saveTitle(event.target.value)}
                                 disabled={selectedPage.isArchived}
                                 className="w-full min-w-0 bg-transparent text-2xl font-semibold leading-9 outline-none disabled:opacity-60"
                                 aria-label="Page title"

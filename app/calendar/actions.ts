@@ -1,11 +1,9 @@
 "use server";
 
-import { currentUser } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 
-import { calendarItems, db, users } from "@/db";
-import { assertFreePlanLimit } from "@/lib/user-preferences";
+import { calendarItems, db } from "@/db";
+import { assertFreePlanLimit, getCurrentDatabaseUser } from "@/lib/user-preferences";
 
 const itemTypes = ["task", "reminder"] as const;
 
@@ -65,27 +63,10 @@ function toDTO(item: typeof calendarItems.$inferSelect): CalendarItemDTO {
   };
 }
 
+// Delegates to the request-cached resolver so repeated calls in one request cost nothing.
 async function getCurrentDatabaseUserId() {
-  const user = await currentUser();
-  const email = user?.primaryEmailAddress?.emailAddress;
-  const clerkId = user?.id;
-
-  if (!email || !clerkId) {
-    throw new Error("You must be signed in to manage calendar items.");
-  }
-
-  const name = user.fullName || user.username || email.split("@")[0] || null;
-
-  const [databaseUser] = await db
-    .insert(users)
-    .values({ clerkId, email, name })
-    .onConflictDoUpdate({
-      target: users.clerkId,
-      set: { email, name },
-    })
-    .returning({ id: users.id });
-
-  return databaseUser.id;
+  const user = await getCurrentDatabaseUser();
+  return user.id;
 }
 
 export async function listCalendarItems() {
@@ -130,7 +111,6 @@ export async function createCalendarItem(input: CalendarItemInput, asDraft = fal
     })
     .returning();
 
-  revalidatePath("/calendar");
   return toDTO(item);
 }
 
@@ -170,7 +150,6 @@ export async function updateCalendarItem(id: number, input: CalendarItemInput, a
     throw new Error("Calendar item not found.");
   }
 
-  revalidatePath("/calendar");
   return toDTO(item);
 }
 
@@ -186,7 +165,6 @@ export async function deleteCalendarItem(id: number) {
     throw new Error("Calendar item not found.");
   }
 
-  revalidatePath("/calendar");
   return { id: item.id };
 }
 
@@ -212,6 +190,5 @@ export async function scheduleCalendarItem(id: number, scheduledDate: string) {
     throw new Error("Calendar item not found.");
   }
 
-  revalidatePath("/calendar");
   return toDTO(item);
 }
