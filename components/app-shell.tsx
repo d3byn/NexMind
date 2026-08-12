@@ -1,24 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronLeft, ChevronsUpDown, PanelLeftOpen, X } from "lucide-react";
 import {
-    Bot,
-    CalendarDays,
-    ChevronLeft,
-    ChevronsUpDown,
-    Columns3,
-    FileText,
-    Home,
-    LayoutTemplate,
-    LucideIcon,
-    PanelLeftOpen,
-    PenTool,
-    FolderKanban,
-    Settings,
-    Sparkles,
-    X,
-} from "lucide-react";
-import { ReactNode, useState } from "react";
+    BookOpenTextIcon,
+    BrainIcon,
+    CalendarCheckIcon,
+    CircleCheckBigIcon,
+    ClipboardIcon,
+    CpuIcon,
+    FolderOpenIcon,
+    HouseIcon,
+    LayoutDashboardIcon,
+    SettingsIcon,
+} from "@animateicons/react/lucide";
+import { ComponentType, ReactNode, RefAttributes, useRef, useState } from "react";
 
 import { toggleGeneratedAppSidebar } from "@/app/ai-template-builder/actions";
 import type { GeneratedSidebarAppDTO } from "@/app/ai-template-builder/actions";
@@ -27,11 +23,23 @@ import { getGeneratedAppIcon } from "@/lib/generated-app-icons";
 import { cn } from "@/lib/utils";
 import { UserButton } from "@clerk/nextjs";
 
+/**
+ * The animated icons render a <div> wrapping an <svg stroke="currentColor">, and expose
+ * start/stop handles via ref. Attaching a ref disables their built-in hover trigger, which is
+ * what we want: the whole nav row drives the animation, not just the 28px icon tile.
+ */
+type AnimatedIconHandle = { startAnimation: () => void; stopAnimation: () => void };
+type AnimatedIcon = ComponentType<
+    { size?: number; duration?: number; color?: string; className?: string; isAnimated?: boolean } & RefAttributes<AnimatedIconHandle>
+>;
+
 type NavItem = {
     label: string;
     href: string;
-    icon: LucideIcon;
-    color: string;
+    icon: AnimatedIcon;
+    /** Gradient tile behind the white icon — each destination gets its own hue. */
+    gradient: string;
+    glow: string;
 };
 
 type NavGroup = {
@@ -43,25 +51,79 @@ const navGroups: NavGroup[] = [
     {
         label: "Home",
         items: [
-            { label: "Dashboard", href: "/dashboard", icon: Home, color: "text-clay-600" },
-            { label: "AI Assistant", href: "/ai-assistant", icon: Bot, color: "text-violet-500" },
+            {
+                label: "Dashboard",
+                href: "/dashboard",
+                icon: HouseIcon,
+                gradient: "bg-[linear-gradient(135deg,#818CF8,#4F46E5)]",
+                glow: "shadow-indigo-500/40",
+            },
+            {
+                label: "AI Assistant",
+                href: "/ai-assistant",
+                icon: CpuIcon,
+                gradient: "bg-[linear-gradient(135deg,#C084FC,#7C3AED)]",
+                glow: "shadow-purple-500/40",
+            },
         ],
     },
     {
         label: "Workspace",
         items: [
-            { label: "Calendar", href: "/calendar", icon: CalendarDays, color: "text-sage-600" },
-            { label: "Task / Kanban", href: "/kanban", icon: Columns3, color: "text-amber-600" },
-            { label: "Notes", href: "/notes", icon: FileText, color: "text-sky-600" },
-            { label: "Whiteboard", href: "/whiteboard", icon: PenTool, color: "text-coral-500" },
-            { label: "Pages / Spaces", href: "/spaces", icon: FolderKanban, color: "text-violet-500" },
+            {
+                label: "Calendar",
+                href: "/calendar",
+                icon: CalendarCheckIcon,
+                gradient: "bg-[linear-gradient(135deg,#34D399,#059669)]",
+                glow: "shadow-emerald-500/40",
+            },
+            {
+                label: "Task / Kanban",
+                href: "/kanban",
+                icon: CircleCheckBigIcon,
+                gradient: "bg-[linear-gradient(135deg,#FBBF24,#D97706)]",
+                glow: "shadow-amber-500/40",
+            },
+            {
+                label: "Notes",
+                href: "/notes",
+                icon: BookOpenTextIcon,
+                gradient: "bg-[linear-gradient(135deg,#38BDF8,#0284C7)]",
+                glow: "shadow-sky-500/40",
+            },
+            {
+                label: "Whiteboard",
+                href: "/whiteboard",
+                icon: ClipboardIcon,
+                gradient: "bg-[linear-gradient(135deg,#FB7185,#E11D48)]",
+                glow: "shadow-rose-500/40",
+            },
+            {
+                label: "Pages / Spaces",
+                href: "/spaces",
+                icon: FolderOpenIcon,
+                gradient: "bg-[linear-gradient(135deg,#2DD4BF,#0D9488)]",
+                glow: "shadow-teal-500/40",
+            },
         ],
     },
     {
         label: "Build",
         items: [
-            { label: "AI Template Builder", href: "/ai-template-builder", icon: LayoutTemplate, color: "text-rose-500" },
-            { label: "Settings", href: "/settings", icon: Settings, color: "text-eclipse-500" },
+            {
+                label: "AI Template Builder",
+                href: "/ai-template-builder",
+                icon: LayoutDashboardIcon,
+                gradient: "bg-[linear-gradient(135deg,#FB923C,#EA580C)]",
+                glow: "shadow-orange-500/40",
+            },
+            {
+                label: "Settings",
+                href: "/settings",
+                icon: SettingsIcon,
+                gradient: "bg-[linear-gradient(135deg,#A5B4FC,#64748B)]",
+                glow: "shadow-slate-500/40",
+            },
         ],
     },
 ];
@@ -81,9 +143,60 @@ type AppShellProps = {
     children: ReactNode;
 };
 
+function SidebarNavItem({ item, active, collapsed }: { item: NavItem; active: boolean; collapsed: boolean }) {
+    const iconRef = useRef<AnimatedIconHandle>(null);
+    const Icon = item.icon;
+
+    return (
+        <Link
+            href={item.href}
+            aria-label={item.label}
+            title={collapsed ? item.label : undefined}
+            onMouseEnter={() => iconRef.current?.startAnimation()}
+            onMouseLeave={() => iconRef.current?.stopAnimation()}
+            onFocus={() => iconRef.current?.startAnimation()}
+            onBlur={() => iconRef.current?.stopAnimation()}
+            className={cn(
+                "group relative flex h-9 items-center rounded-lg px-2 text-[13px] font-medium transition-all duration-150",
+                collapsed ? "justify-center" : "gap-2.5 max-sm:justify-center",
+                active
+                    ? "bg-[linear-gradient(90deg,hsl(252_88%_94%),hsl(252_88%_94%/.35))] font-semibold text-primary shadow-sm"
+                    : "text-muted-foreground hover:translate-x-0.5 hover:bg-accent hover:text-foreground",
+            )}
+        >
+            {active && (
+                <span
+                    className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-[linear-gradient(180deg,var(--grape),hsl(244_74%_54%))]"
+                    aria-hidden="true"
+                />
+            )}
+            <span
+                className={cn(
+                    "flex size-7 shrink-0 items-center justify-center rounded-lg shadow-sm transition-all duration-200 group-hover:scale-110",
+                    item.gradient,
+                    item.glow,
+                    active ? "shadow-md ring-2 ring-white/70" : "group-hover:shadow-md",
+                )}
+            >
+                <Icon ref={iconRef} size={16} duration={1} color="#ffffff" isAnimated />
+            </span>
+            <span
+                className={cn(
+                    "min-w-0 truncate transition-[opacity,transform] ease-[cubic-bezier(0.32,0.72,0,1)]",
+                    collapsed ? "w-0 -translate-x-1 opacity-0 duration-150" : "translate-x-0 opacity-100 delay-150 duration-200",
+                    "max-sm:hidden",
+                )}
+            >
+                {item.label}
+            </span>
+        </Link>
+    );
+}
+
 export function AppShell({ activePage, generatedSidebarApps = [], children }: AppShellProps) {
     const [collapsed, setCollapsed] = useState(false);
     const [sidebarApps, setSidebarApps] = useState(generatedSidebarApps);
+    const brandIconRef = useRef<AnimatedIconHandle>(null);
 
     function removeGeneratedSidebarApp(appId: number) {
         setSidebarApps((current) => current.filter((app) => app.id !== appId));
@@ -106,8 +219,12 @@ export function AppShell({ activePage, generatedSidebarApps = [], children }: Ap
                             collapsed ? "flex-col items-center" : "h-11 flex-row items-center max-sm:flex-col max-sm:items-center",
                         )}
                     >
-                        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(135deg,var(--grape),hsl(244_74%_54%)_55%,var(--eclipse-900))] text-primary-foreground shadow-md shadow-primary/30">
-                            <Sparkles className="size-4" aria-hidden="true" />
+                        <div
+                            className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-[linear-gradient(135deg,var(--grape),hsl(244_74%_54%)_55%,var(--eclipse-900))] shadow-md shadow-primary/30 transition-transform duration-200 hover:scale-105"
+                            onMouseEnter={() => brandIconRef.current?.startAnimation()}
+                            onMouseLeave={() => brandIconRef.current?.stopAnimation()}
+                        >
+                            <BrainIcon ref={brandIconRef} size={20} duration={1} color="#ffffff" isAnimated />
                         </div>
                         <div
                             className={cn(
@@ -149,7 +266,6 @@ export function AppShell({ activePage, generatedSidebarApps = [], children }: Ap
                                     {group.label}
                                 </p>
                                 {group.items.map((item) => {
-                                    const Icon = item.icon;
                                     const active =
                                         (activePage === "dashboard" && item.href === "/dashboard") ||
                                         (activePage === "ai-assistant" && item.href === "/ai-assistant") ||
@@ -161,38 +277,7 @@ export function AppShell({ activePage, generatedSidebarApps = [], children }: Ap
                                         (activePage === "ai-template-builder" && item.href === "/ai-template-builder") ||
                                         (activePage === "settings" && item.href === "/settings");
 
-                                    return (
-                                        <Link
-                                            key={item.label}
-                                            href={item.href}
-                                            aria-label={item.label}
-                                            title={collapsed ? item.label : undefined}
-                                            className={cn(
-                                                "group relative flex h-9 items-center rounded-lg px-2.5 text-[13px] font-medium transition-all duration-150",
-                                                collapsed ? "justify-center" : "gap-2.5 max-sm:justify-center",
-                                                active
-                                                    ? "bg-[linear-gradient(90deg,hsl(252_88%_94%),hsl(252_88%_94%/.35))] font-semibold text-primary shadow-sm"
-                                                    : "text-muted-foreground hover:translate-x-0.5 hover:bg-accent hover:text-foreground",
-                                            )}
-                                        >
-                                            {active && (
-                                                <span
-                                                    className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-[linear-gradient(180deg,var(--grape),hsl(244_74%_54%))]"
-                                                    aria-hidden="true"
-                                                />
-                                            )}
-                                            <Icon className={cn("size-4 shrink-0 transition-transform duration-150 group-hover:scale-110", item.color)} aria-hidden="true" />
-                                            <span
-                                                className={cn(
-                                                    "min-w-0 truncate transition-[opacity,transform] ease-[cubic-bezier(0.32,0.72,0,1)]",
-                                                    collapsed ? "w-0 -translate-x-1 opacity-0 duration-150" : "translate-x-0 opacity-100 delay-150 duration-200",
-                                                    "max-sm:hidden",
-                                                )}
-                                            >
-                                                {item.label}
-                                            </span>
-                                        </Link>
-                                    );
+                                    return <SidebarNavItem key={item.label} item={item} active={active} collapsed={collapsed} />;
                                 })}
                             </div>
                         ))}
@@ -216,11 +301,16 @@ export function AppShell({ activePage, generatedSidebarApps = [], children }: Ap
                                                 aria-label={app.appName}
                                                 title={collapsed ? app.appName : undefined}
                                                 className={cn(
-                                                    "flex h-9 min-w-0 flex-1 items-center rounded-lg px-2.5 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
+                                                    "group flex h-9 min-w-0 flex-1 items-center rounded-lg px-2 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
                                                     collapsed ? "justify-center" : "gap-2.5 max-sm:justify-center",
                                                 )}
                                             >
-                                                <Icon className="size-4 shrink-0" style={{ color: app.color }} aria-hidden="true" />
+                                                <span
+                                                    className="flex size-7 shrink-0 items-center justify-center rounded-lg text-white shadow-sm transition-transform duration-200 group-hover:scale-110"
+                                                    style={{ backgroundImage: `linear-gradient(135deg, ${app.color}, ${app.color}b3)` }}
+                                                >
+                                                    <Icon className="size-4" aria-hidden="true" />
+                                                </span>
                                                 <span
                                                     className={cn(
                                                         "min-w-0 truncate transition-[opacity,transform] ease-[cubic-bezier(0.32,0.72,0,1)]",
