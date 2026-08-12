@@ -30,6 +30,22 @@
   --color-ring: var(--ring);
 
   --color-sidebar: var(--sidebar);
+  --color-paper: var(--paper);
+  --color-grape: var(--grape);
+  --color-aqua: var(--aqua);
+  --color-blush: var(--blush);
+  --color-lime: var(--lime);
+  --color-sun: var(--sun);
+  --color-eclipse-50: var(--eclipse-50);
+  --color-eclipse-100: var(--eclipse-100);
+  --color-eclipse-200: var(--eclipse-200);
+  --color-eclipse-300: var(--eclipse-300);
+  --color-eclipse-400: var(--eclipse-400);
+  --color-eclipse-500: var(--eclipse-500);
+  --color-eclipse-600: var(--eclipse-600);
+  --color-eclipse-700: var(--eclipse-700);
+  --color-eclipse-800: var(--eclipse-800);
+  --color-eclipse-900: var(--eclipse-900);
   --color-clay-100: var(--clay-100);
   --color-clay-200: var(--clay-200);
   --color-clay-400: var(--clay-400);
@@ -75,70 +91,105 @@
   }
 }
 
+/*
+ * "Blue eclipse" palette. The four source colours are pinned to the eclipse ramp:
+ *   #0F0E47 -> eclipse-900   #272757 -> eclipse-800
+ *   #505081 -> eclipse-600   #8686AC -> eclipse-400
+ * Status hues (sage / amber / clay) are kept but pulled cooler so they sit with the indigos.
+ */
 :root {
-  --background: hsl(42 82% 97%);
-  --foreground: hsl(222 28% 14%);
+  --eclipse-50: hsl(240 40% 97%);
+  --eclipse-100: hsl(240 38% 94%);
+  --eclipse-200: hsl(240 32% 87%);
+  --eclipse-300: hsl(240 26% 76%);
+  --eclipse-400: hsl(240 20% 60%);
+  --eclipse-500: hsl(240 21% 50%);
+  --eclipse-600: hsl(240 23% 41%);
+  --eclipse-700: hsl(240 32% 33%);
+  --eclipse-800: hsl(240 39% 25%);
+  --eclipse-900: hsl(241 67% 16%);
+
+  /* Vivid accents layered over the eclipse base so the UI reads playful, not corporate. */
+  --grape: hsl(268 78% 62%);
+  --aqua: hsl(190 88% 48%);
+  --blush: hsl(330 82% 63%);
+  --lime: hsl(154 68% 42%);
+  --sun: hsl(40 96% 55%);
+
+  --background: hsl(243 58% 97.5%);
+  --foreground: hsl(243 62% 14%);
   --card: hsl(0 0% 100%);
-  --card-foreground: hsl(222 28% 14%);
+  --card-foreground: hsl(243 62% 14%);
   --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(222 28% 14%);
-  --primary: hsl(8 82% 62%);
+  --popover-foreground: hsl(243 62% 14%);
+  --paper: hsl(246 70% 99.2%);
+  --primary: hsl(248 72% 60%);
   --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(164 52% 91%);
-  --secondary-foreground: hsl(175 46% 24%);
-  --muted: hsl(39 62% 93%);
-  --muted-foreground: hsl(221 15% 42%);
-  --accent: hsl(190 70% 92%);
-  --accent-foreground: hsl(207 52% 26%);
-  --destructive: hsl(2 78% 55%);
-  --destructive-foreground: hsl(42 48% 99%);
-  --border: hsl(36 45% 86%);
-  --input: hsl(36 45% 86%);
-  --ring: hsl(8 82% 62%);
-  --sidebar: hsl(45 86% 98%);
-  --clay-100: hsl(11 94% 94%);
-  --clay-200: hsl(10 90% 86%);
-  --clay-400: hsl(8 82% 68%);
-  --clay-600: hsl(8 72% 52%);
-  --clay-700: hsl(8 64% 41%);
-  --clay-800: hsl(8 54% 32%);
-  --coral-500: hsl(356 86% 66%);
-  --sage-100: hsl(153 58% 91%);
-  --sage-200: hsl(154 52% 80%);
-  --sage-400: hsl(158 46% 58%);
-  --sage-600: hsl(164 58% 34%);
-  --sage-700: hsl(168 58% 27%);
-  --sage-800: hsl(170 54% 22%);
-  --amber-100: hsl(43 96% 89%);
-  --amber-200: hsl(42 94% 77%);
-  --amber-400: hsl(38 91% 56%);
-  --amber-600: hsl(34 89% 45%);
-  --amber-700: hsl(31 82% 36%);
-  --amber-800: hsl(28 74% 29%);
-  --radius: 0.5rem;
+  --secondary: hsl(250 72% 93%);
+  --secondary-foreground: hsl(248 58% 34%);
+  --muted: hsl(244 56% 95.5%);
+  --muted-foreground: hsl(244 24% 48%);
+  --accent: hsl(252 78% 94%);
+  --accent-foreground: hsl(248 58% 34%);
+  --destructive: hsl(348 84% 56%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(244 48% 89%);
+  --input: hsl(244 48% 89%);
+  --ring: hsl(248 72% 60%);
+  --sidebar: hsl(248 62% 98.5%);
+  --clay-100: hsl(348 100% 95%);
+  --clay-200: hsl(348 92% 87%);
+  --clay-400: hsl(348 88% 67%);
+  --clay-600: hsl(348 80% 55%);
+  --clay-700: hsl(348 70% 43%);
+  --clay-800: hsl(348 62% 33%);
+  --coral-500: hsl(250 88% 68%);
+  --sage-100: hsl(158 72% 91%);
+  --sage-200: hsl(158 64% 79%);
+  --sage-400: hsl(157 60% 56%);
+  --sage-600: hsl(160 72% 36%);
+  --sage-700: hsl(163 72% 28%);
+  --sage-800: hsl(165 66% 22%);
+  --amber-100: hsl(45 100% 88%);
+  --amber-200: hsl(43 98% 75%);
+  --amber-400: hsl(40 96% 56%);
+  --amber-600: hsl(36 94% 48%);
+  --amber-700: hsl(32 88% 38%);
+  --amber-800: hsl(29 80% 30%);
+  --radius: 0.7rem;
 }
 
 .dark {
-  --background: hsl(25 18% 10%);
-  --foreground: hsl(42 42% 94%);
-  --card: hsl(25 18% 13%);
-  --card-foreground: hsl(42 42% 94%);
-  --popover: hsl(25 18% 13%);
-  --popover-foreground: hsl(42 42% 94%);
-  --primary: hsl(12 55% 66%);
-  --primary-foreground: hsl(25 18% 10%);
-  --secondary: hsl(92 14% 24%);
-  --secondary-foreground: hsl(92 27% 86%);
-  --muted: hsl(26 15% 19%);
-  --muted-foreground: hsl(35 18% 71%);
-  --accent: hsl(28 22% 22%);
-  --accent-foreground: hsl(42 42% 94%);
-  --destructive: hsl(3 70% 60%);
-  --destructive-foreground: hsl(42 42% 94%);
-  --border: hsl(27 16% 25%);
-  --input: hsl(27 16% 25%);
-  --ring: hsl(12 55% 66%);
-  --sidebar: hsl(25 20% 12%);
+  --background: hsl(243 58% 8.5%);
+  --foreground: hsl(246 50% 95%);
+  --card: hsl(243 48% 14%);
+  --card-foreground: hsl(246 50% 95%);
+  --popover: hsl(243 48% 15%);
+  --popover-foreground: hsl(246 50% 95%);
+  --paper: hsl(243 46% 13%);
+  --primary: hsl(250 88% 72%);
+  --primary-foreground: hsl(243 62% 11%);
+  --secondary: hsl(246 38% 25%);
+  --secondary-foreground: hsl(248 55% 90%);
+  --muted: hsl(244 36% 18%);
+  --muted-foreground: hsl(246 28% 74%);
+  --accent: hsl(248 40% 23%);
+  --accent-foreground: hsl(246 50% 95%);
+  --destructive: hsl(348 82% 64%);
+  --destructive-foreground: hsl(246 50% 95%);
+  --border: hsl(245 32% 27%);
+  --input: hsl(245 32% 27%);
+  --ring: hsl(250 88% 72%);
+  --sidebar: hsl(243 54% 10.5%);
+  --clay-100: hsl(350 40% 22%);
+  --clay-200: hsl(350 40% 30%);
+  --clay-800: hsl(350 80% 88%);
+  --sage-100: hsl(168 40% 18%);
+  --sage-200: hsl(168 38% 26%);
+  --sage-800: hsl(160 50% 84%);
+  --amber-100: hsl(36 45% 20%);
+  --amber-200: hsl(36 45% 28%);
+  --amber-800: hsl(44 88% 84%);
 }
 
 @layer base {
