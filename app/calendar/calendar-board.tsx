@@ -30,11 +30,11 @@ type DraftForm = {
 
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const fallbackCategories: UserCategoryDTO[] = [
-    { id: -1, scope: "calendar", name: "Work", color: "#5BAE91", icon: "BriefcaseBusiness", createdAt: "", updatedAt: "" },
-    { id: -2, scope: "calendar", name: "Personal", color: "#EF806F", icon: "Heart", createdAt: "", updatedAt: "" },
-    { id: -3, scope: "calendar", name: "Focus", color: "#4BA3C7", icon: "Focus", createdAt: "", updatedAt: "" },
-    { id: -4, scope: "calendar", name: "Meeting", color: "#E6A23C", icon: "Users", createdAt: "", updatedAt: "" },
-    { id: -5, scope: "reminder", name: "Reminder", color: "#8B7CF6", icon: "Bell", createdAt: "", updatedAt: "" },
+    { id: -1, scope: "calendar", name: "Work", color: "#505081", icon: "BriefcaseBusiness", createdAt: "", updatedAt: "" },
+    { id: -2, scope: "calendar", name: "Personal", color: "#D6577A", icon: "Heart", createdAt: "", updatedAt: "" },
+    { id: -3, scope: "calendar", name: "Focus", color: "#4C7FD1", icon: "Focus", createdAt: "", updatedAt: "" },
+    { id: -4, scope: "calendar", name: "Meeting", color: "#D99A34", icon: "Users", createdAt: "", updatedAt: "" },
+    { id: -5, scope: "reminder", name: "Reminder", color: "#7C6BD4", icon: "Bell", createdAt: "", updatedAt: "" },
 ];
 const emptyForm: DraftForm = { title: "", description: "", scheduledTime: "", isAllDay: false, itemType: "task", category: "Work" };
 
@@ -689,6 +689,6 @@ function categoryStyle(name: string, categories: UserCategoryDTO[]) {
     const category = categories.find((item) => item.name.toLowerCase() === name.toLowerCase());
     return {
         label: category?.name || name || "Work",
-        color: category?.color || "#5BAE91",
+        color: category?.color || "#505081",
     };
 }
