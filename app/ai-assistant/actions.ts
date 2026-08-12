@@ -128,7 +128,7 @@ function cleanActionProposal(value: unknown): AssistantActionProposal | undefine
     type,
     title: cleanText(record.title, "Confirm action", 80),
     summary: cleanText(record.summary, "Review and confirm this action.", 240),
-    appArea: cleanText(record.appArea, "Flowbase", 40),
+    appArea: cleanText(record.appArea, "NexMind", 40),
     requiresConfirmation: true,
     payload:
       record.payload && typeof record.payload === "object" && !Array.isArray(record.payload)
@@ -248,7 +248,7 @@ export async function sendAssistantMessage(messages: AssistantMessageInput[]): P
   const response = await ai.models.generateContent({
     model: GEMINI_MODEL,
     contents: [
-      "You are Flowbase AI Assistant, a concise command center for a productivity app.",
+      "You are NexMind AI Assistant, a concise command center for a productivity app.",
       "Return only strict JSON. Never include markdown fences or commentary outside JSON.",
       'Schema: {"text":"string","clarification":"optional string","action":{"type":"create_kanban_board|create_kanban_task|create_calendar_item|create_note|update_note_content|create_whiteboard|generate_whiteboard_diagram|generate_template_app|update_settings","title":"string","summary":"string","appArea":"string","requiresConfirmation":true,"payload":{}}}',
       "Always ask a clarification question instead of proposing a save action when required details are missing. Calendar writes require scheduledDate as YYYY-MM-DD. Calendar time is optional but must be HH:mm when present.",

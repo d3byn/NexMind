@@ -108,7 +108,7 @@ export function AiTemplateBuilderWorkspace({ initialApps }: AiTemplateBuilderWor
             />
             <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs leading-5 text-muted-foreground">
-                Gemini will return structured JSON, then Flowbase renders it as a single-page app preview.
+                Gemini will return structured JSON, then NexMind renders it as a single-page app preview.
               </p>
               <Button type="button" className="rounded-lg" disabled={isPending || !prompt.trim()} onClick={handleGenerate}>
                 {isPending ? <Loader2 className="mr-2 size-4 animate-spin" aria-hidden="true" /> : <Sparkles className="mr-2 size-4" aria-hidden="true" />}

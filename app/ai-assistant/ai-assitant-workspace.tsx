@@ -299,7 +299,7 @@ export function AiAssistantWorkspace({ initialSnapshot }: { initialSnapshot: Ass
               value={prompt}
               onChange={(event) => setPrompt(event.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask Flowbase AI to plan, summarize, or prepare an action..."
+              placeholder="Ask NexMind AI to plan, summarize, or prepare an action..."
               rows={2}
               className="max-h-40 min-h-14 w-full resize-none bg-transparent px-2 py-2 text-sm leading-6 text-foreground outline-none placeholder:text-muted-foreground"
             />
