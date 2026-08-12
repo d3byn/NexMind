@@ -22,6 +22,8 @@ export default async function NotesPage() {
     listCategoriesForScopes(["note"]),
   ]);
 
+
+
   return (
     <AppShell activePage="notes" generatedSidebarApps={sidebarApps}>
       <section className="mx-auto flex h-screen max-h-screen w-full max-w-[100rem] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
