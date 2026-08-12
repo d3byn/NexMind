@@ -422,11 +422,22 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
   return (
     <div className="relative min-h-0 flex-1">
       {!selectedSpace && (
-        <section className="min-h-0 overflow-y-auto rounded-lg bg-card p-4 shadow-sm ring-1 ring-border/70">
+        <section className="min-h-0 overflow-y-auto rounded-xl border border-border bg-card p-4 shadow-sm">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div className="min-w-0">
               <h2 className="text-2xl font-semibold tracking-normal">All Spaces</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{visibleSpaces.length} spaces</p>
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold tabular-nums text-muted-foreground">
+                  {visibleSpaces.length} {visibleSpaces.length === 1 ? "space" : "spaces"}
+                </span>
+                <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold tabular-nums text-muted-foreground">
+                  {visibleSpaces.reduce((count, space) => count + space.pageCount, 0)} pages
+                </span>
+                <span className="flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-semibold tabular-nums text-amber-800">
+                  <Star className="size-3 fill-current" aria-hidden="true" />
+                  {visibleSpaces.filter((space) => space.isFavorite).length} favorites
+                </span>
+              </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <Button className="h-9 rounded-lg" onClick={() => setSpacePanelOpen(true)}>
@@ -441,7 +452,7 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
           </div>
 
           <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto_auto]">
-            <label className="flex h-10 min-w-0 items-center gap-2 rounded-lg border border-border bg-background px-3 text-sm">
+            <label className="flex h-10 min-w-0 items-center gap-2 rounded-lg border border-border bg-background px-3 text-sm transition-colors focus-within:border-primary/40 focus-within:bg-card focus-within:ring-2 focus-within:ring-primary/10">
               <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
               <input
                 value={query}
@@ -449,6 +460,16 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
                 placeholder="Search spaces or pages..."
                 className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
               />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="shrink-0 rounded-md p-0.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  aria-label="Clear search"
+                >
+                  <X className="size-3.5" aria-hidden="true" />
+                </button>
+              )}
             </label>
 
             <div className="flex h-10 rounded-lg border border-border bg-background p-1">
@@ -522,10 +543,16 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
           </div>
 
           {visibleSpaces.length === 0 && (
-            <div className="flex min-h-56 flex-col items-center justify-center rounded-lg px-4 text-center">
-              <Folder className="size-8 text-muted-foreground" aria-hidden="true" />
-              <h3 className="mt-3 text-base font-semibold">No spaces found</h3>
-              <p className="mt-1 text-sm text-muted-foreground">Create a space or adjust the current search and filters.</p>
+            <div className="mt-4 flex min-h-56 flex-col items-center justify-center rounded-xl border border-dashed border-border px-4 text-center">
+              <div className="flex size-14 items-center justify-center rounded-2xl bg-violet-100 text-violet-700">
+                <Folder className="size-7" aria-hidden="true" />
+              </div>
+              <h3 className="mt-4 text-base font-semibold">No spaces found</h3>
+              <p className="mt-1.5 text-sm text-muted-foreground">Create a space or adjust the current search and filters.</p>
+              <Button className="mt-5 rounded-lg" onClick={() => setSpacePanelOpen(true)}>
+                <Plus className="mr-2 size-4" aria-hidden="true" />
+                New Space
+              </Button>
             </div>
           )}
         </section>
@@ -533,10 +560,11 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
 
       {selectedSpace && (
         <section className={cn("grid min-h-0 gap-5", selectedPage && "lg:grid-cols-[minmax(0,1fr)_19rem] xl:grid-cols-1 2xl:grid-cols-[minmax(0,1fr)_20rem]")}>
-          <div className="flex min-h-[42rem] min-w-0 flex-col overflow-hidden rounded-lg bg-[hsl(42_82%_99%)] shadow-sm ring-1 ring-border/70">
+          <div className="flex min-h-[42rem] min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-[hsl(42_82%_99%)] shadow-sm">
             {selectedSpace ? (
               <>
-                <div className="shrink-0 border-b border-border/70 bg-card/80 px-4 py-3 backdrop-blur">
+                <span className={cn("h-1 w-full shrink-0", colorStyles[selectedSpace.color].dot)} aria-hidden="true" />
+                <div className="shrink-0 border-b border-border bg-card/80 px-4 py-3 backdrop-blur">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
                       <button
@@ -554,12 +582,14 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
                         {selectedPage ? `${selectedSpace.name} > Pages` : "All Spaces"}
                       </button>
                       <div className="mt-2 flex min-w-0 items-center gap-3">
-                        <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-lg", colorStyles[selectedSpace.color].soft)}>
+                        <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-xl", colorStyles[selectedSpace.color].soft)}>
                           <Folder className={cn("size-5", colorStyles[selectedSpace.color].folder)} aria-hidden="true" />
                         </span>
                         <div className="min-w-0">
                           <h2 className="truncate text-xl font-semibold">{selectedSpace.name}</h2>
-                          <p className="truncate text-sm text-muted-foreground">{selectedSpace.pageCount} pages</p>
+                          <span className={cn("mt-1 inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums", colorStyles[selectedSpace.color].chip)}>
+                            {selectedSpace.pageCount} {selectedSpace.pageCount === 1 ? "page" : "pages"}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -577,15 +607,15 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
 
                 <div className="min-h-0 flex-1">
                   {!selectedPage && (
-                    <div className="h-full min-h-[34rem] overflow-y-auto bg-card/45 p-4">
-                      <div className="min-h-full overflow-visible rounded-lg border border-border bg-card">
+                    <div className="h-full min-h-[34rem] overflow-y-auto bg-background/50 p-4">
+                      <div className="min-h-full overflow-visible rounded-xl border border-border bg-card shadow-sm">
                         <table className="w-full text-left text-sm">
-                          <thead className="bg-muted/60 text-xs uppercase text-muted-foreground">
+                          <thead className="bg-muted/60 text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
                             <tr>
-                              <th className="px-3 py-2 font-semibold">Page Name</th>
-                              <th className="hidden px-3 py-2 font-semibold sm:table-cell">Type</th>
-                              <th className="px-3 py-2 font-semibold">Updated</th>
-                              <th className="w-10 px-2 py-2" />
+                              <th className="px-3 py-2.5 font-semibold">Page Name</th>
+                              <th className="hidden px-3 py-2.5 font-semibold sm:table-cell">Type</th>
+                              <th className="px-3 py-2.5 font-semibold">Updated</th>
+                              <th className="w-10 px-2 py-2.5" />
                             </tr>
                           </thead>
                           <tbody>
@@ -615,6 +645,19 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
                             ))}
                           </tbody>
                         </table>
+                        {selectedSpace.pages.length === 0 && (
+                          <div className="flex flex-col items-center justify-center px-4 py-14 text-center">
+                            <div className="flex size-12 items-center justify-center rounded-2xl bg-violet-100 text-violet-700">
+                              <FileText className="size-6" aria-hidden="true" />
+                            </div>
+                            <h3 className="mt-3.5 text-base font-semibold">No pages in this space</h3>
+                            <p className="mt-1.5 text-sm text-muted-foreground">Add a page to start writing inside {selectedSpace.name}.</p>
+                            <Button className="mt-5 rounded-lg" onClick={() => setPagePanelOpen(true)}>
+                              <Plus className="mr-2 size-4" aria-hidden="true" />
+                              New Page
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -633,14 +676,30 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
                                 aria-label="Page title"
                               />
                               <p className="text-xs text-muted-foreground">
-                                {selectedPage.template} · Updated {formatUpdatedAt(selectedPage.updatedAt)} · {selectedPage.updatedBy?.initials ?? "You"}
+                                <span className="capitalize">{selectedPage.template}</span> · Updated {formatUpdatedAt(selectedPage.updatedAt)} · {selectedPage.updatedBy?.initials ?? "You"}
                               </p>
                             </div>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <span className={cn("rounded-full px-2.5 py-1", saveState === "error" ? "bg-destructive/10 text-destructive" : "bg-muted")}>
+                            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
+                              <span
+                                className={cn(
+                                  "flex items-center gap-1.5 rounded-full px-2.5 py-1",
+                                  saveState === "error"
+                                    ? "bg-destructive/10 text-destructive"
+                                    : saveState === "saving"
+                                      ? "bg-amber-100 text-amber-800"
+                                      : "bg-sage-100 text-sage-800",
+                                )}
+                              >
+                                <span
+                                  className={cn(
+                                    "size-1.5 rounded-full",
+                                    saveState === "error" ? "bg-destructive" : saveState === "saving" ? "animate-pulse bg-amber-600" : "bg-sage-600",
+                                  )}
+                                  aria-hidden="true"
+                                />
                                 {saveState === "saving" ? "Saving..." : saveState === "error" ? "Save error" : "Saved"}
                               </span>
-                              <span className="rounded-full bg-muted px-2.5 py-1">{editor?.storage.characterCount.words() ?? selectedPage.wordCount} words</span>
+                              <span className="rounded-full bg-muted px-2.5 py-1 tabular-nums">{editor?.storage.characterCount.words() ?? selectedPage.wordCount} words</span>
                             </div>
                           </div>
 
@@ -697,7 +756,7 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
                               </div>
                             </BubbleMenu>
                           )}
-                          <EditorContent editor={editor} className={cn("mx-auto max-w-4xl rounded-lg bg-card px-5 py-6 shadow-sm ring-1 ring-border/60 sm:px-8 lg:px-10", selectedPage.isArchived && "pointer-events-none opacity-60")} />
+                          <EditorContent editor={editor} className={cn("mx-auto max-w-4xl rounded-xl border border-border bg-card px-5 py-6 shadow-sm sm:px-8 lg:px-10", selectedPage.isArchived && "pointer-events-none opacity-60")} />
                         </div>
                       </>
 
@@ -837,13 +896,14 @@ function SpaceCard({
         type="button"
         onClick={onOpen}
         className={cn(
-          "group w-full rounded-lg border bg-card p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
+          "group relative w-full overflow-hidden rounded-xl border bg-card p-4 text-left shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md",
           colorStyles[space.color].border,
           selected && "ring-2 ring-primary/20",
           compact && "flex items-center gap-4",
         )}
       >
-        <span className={cn("flex size-11 shrink-0 items-center justify-center rounded-lg", colorStyles[space.color].soft)}>
+        <span className={cn("absolute inset-x-0 top-0 h-1", colorStyles[space.color].dot)} aria-hidden="true" />
+        <span className={cn("flex size-11 shrink-0 items-center justify-center rounded-xl", colorStyles[space.color].soft)}>
           <Folder className={cn("size-5", colorStyles[space.color].folder)} aria-hidden="true" />
         </span>
         <span className={cn("block min-w-0", compact && "flex-1")}>
@@ -860,7 +920,10 @@ function SpaceCard({
                 onKeyDown={(event: ReactKeyboardEvent<HTMLSpanElement>) => {
                   if (event.key === "Enter" || event.key === " ") onFavorite();
                 }}
-                className={cn("flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-amber-600", space.isFavorite && "text-amber-600")}
+                className={cn(
+                  "flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-opacity hover:bg-muted hover:text-amber-600",
+                  space.isFavorite ? "text-amber-600" : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100",
+                )}
                 title={space.isFavorite ? "Unfavorite space" : "Favorite space"}
                 aria-label={space.isFavorite ? "Unfavorite space" : "Favorite space"}
               >
@@ -886,15 +949,21 @@ function SpaceCard({
             </span>
           </span>
           <span className="mt-2 line-clamp-2 min-h-10 text-sm leading-5 text-muted-foreground">{space.description}</span>
-          <span className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <span className="mt-3 flex flex-wrap items-center gap-1.5">
+            <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums", colorStyles[space.color].chip)}>
+              {space.pageCount} {space.pageCount === 1 ? "page" : "pages"}
+            </span>
+            {space.isArchived && (
+              <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">Archived</span>
+            )}
+          </span>
+          <span className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-3">
             <span className="flex -space-x-2">
               {[space.owner, ...space.shares].slice(0, 4).map((member) => (
                 <Avatar key={`${member.role}-${member.email}`} member={member} />
               ))}
             </span>
-            <span className="text-xs font-medium text-muted-foreground">
-              {space.pageCount} Pages · Updated {formatUpdatedAt(space.updatedAt)}
-            </span>
+            <span className="text-xs font-medium text-muted-foreground">Updated {formatUpdatedAt(space.updatedAt)}</span>
           </span>
         </span>
       </button>
@@ -955,21 +1024,37 @@ function PageRow({
   onDelete: () => void;
 }) {
   return (
-    <tr className={cn("relative border-t border-border transition-colors hover:bg-muted/50", selected && "bg-violet-50/80")}>
-      <td className="max-w-40 px-3 py-2">
-        <button type="button" onClick={onSelect} className="flex min-w-0 items-center gap-2 text-left">
-          <FileText className="size-4 shrink-0 text-violet-600" aria-hidden="true" />
+    <tr className={cn("group relative border-t border-border transition-colors hover:bg-muted/50", selected && "bg-violet-50/80")}>
+      <td className="max-w-40 px-3 py-2.5">
+        <button type="button" onClick={onSelect} className="flex min-w-0 items-center gap-2.5 text-left">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-violet-100 text-violet-700">
+            <FileText className="size-4" aria-hidden="true" />
+          </span>
           <span className="min-w-0">
-            <span className="block truncate font-medium">{page.title}</span>
+            <span className="flex min-w-0 items-center gap-1.5">
+              <span className="truncate font-medium">{page.title}</span>
+              {page.isFavorite && <Star className="size-3 shrink-0 fill-current text-amber-600" aria-hidden="true" />}
+            </span>
             <span className="block truncate text-xs text-muted-foreground">By {page.updatedBy?.initials ?? "You"}</span>
           </span>
         </button>
       </td>
-      <td className="hidden px-3 py-2 text-xs text-muted-foreground sm:table-cell">{page.pageType}</td>
-      <td className="px-3 py-2 text-xs text-muted-foreground">{formatUpdatedAt(page.updatedAt)}</td>
-      <td className="px-2 py-2">
+      <td className="hidden px-3 py-2.5 sm:table-cell">
+        <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium capitalize text-muted-foreground">{page.pageType}</span>
+      </td>
+      <td className="px-3 py-2.5 text-xs text-muted-foreground">{formatUpdatedAt(page.updatedAt)}</td>
+      <td className="px-2 py-2.5">
         <div className="flex items-center justify-end gap-1">
-          <button type="button" onClick={onFavorite} className={cn("flex size-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-card hover:text-amber-600", page.isFavorite && "text-amber-600")} title="Favorite" aria-label="Favorite">
+          <button
+            type="button"
+            onClick={onFavorite}
+            className={cn(
+              "flex size-7 items-center justify-center rounded-lg text-muted-foreground transition-opacity hover:bg-card hover:text-amber-600",
+              page.isFavorite ? "text-amber-600" : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100",
+            )}
+            title="Favorite"
+            aria-label="Favorite"
+          >
             <Star className={cn("size-3.5", page.isFavorite && "fill-current")} aria-hidden="true" />
           </button>
           <button type="button" data-options-popover onClick={onMenu} className="flex size-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-card hover:text-foreground" title="Page actions" aria-label="Page actions">
@@ -1299,11 +1384,13 @@ function Toolbar({
 
 function EmptyEditor({ onNewPage }: { onNewPage: () => void }) {
   return (
-    <div className="flex min-h-96 flex-1 flex-col items-center justify-center px-6 text-center">
-      <BookOpen className="size-8 text-muted-foreground" aria-hidden="true" />
-      <h2 className="mt-3 text-lg font-semibold">Open a space page</h2>
-      <p className="mt-1 max-w-sm text-sm leading-6 text-muted-foreground">Create or select a page to write with rich text, AI refinement, and voice dictation.</p>
-      <Button className="mt-4 rounded-lg" onClick={onNewPage}>
+    <div className="flex min-h-96 flex-1 flex-col items-center justify-center px-6 py-10 text-center">
+      <div className="flex size-14 items-center justify-center rounded-2xl bg-violet-100 text-violet-700">
+        <BookOpen className="size-7" aria-hidden="true" />
+      </div>
+      <h2 className="mt-4 text-lg font-semibold">Open a space page</h2>
+      <p className="mt-1.5 max-w-sm text-sm leading-6 text-muted-foreground">Create or select a page to write with rich text, AI refinement, and voice dictation.</p>
+      <Button className="mt-5 rounded-lg" onClick={onNewPage}>
         <Plus className="mr-2 size-4" aria-hidden="true" />
         New Page
       </Button>
