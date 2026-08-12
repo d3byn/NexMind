@@ -80,6 +80,12 @@ const priorityStyles: Record<TaskPriority, string> = {
   high: "border-clay-200 bg-clay-100 text-clay-800",
 };
 
+const priorityAccents: Record<TaskPriority, string> = {
+  low: "border-l-sage-400",
+  medium: "border-l-amber-400",
+  high: "border-l-clay-400",
+};
+
 const labelStyles: Record<KanbanLabelDTO["color"], string> = {
   sage: "border-sage-200 bg-sage-100 text-sage-800",
   clay: "border-clay-200 bg-clay-100 text-clay-800",
@@ -92,6 +98,20 @@ const emptyBoardForm: BoardForm = { name: "", color: "sage" };
 
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
+}
+
+function dueDateStatus(value: string) {
+  const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day) {
+    return { label: value, className: "border-border bg-muted text-muted-foreground" };
+  }
+
+  const label = new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(new Date(year, month - 1, day));
+  const today = todayKey();
+
+  if (value < today) return { label: `${label} · overdue`, className: "border-clay-200 bg-clay-100 text-clay-800" };
+  if (value === today) return { label: `${label} · today`, className: "border-amber-200 bg-amber-100 text-amber-800" };
+  return { label, className: "border-border bg-muted text-muted-foreground" };
 }
 
 function emptyTaskForm(columnId = 0): TaskForm {
@@ -122,6 +142,7 @@ export function KanbanWorkspace({ initialBoards, categories }: { initialBoards: 
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [taskForm, setTaskForm] = useState<TaskForm>(emptyTaskForm());
   const [draggingTaskId, setDraggingTaskId] = useState<number | null>(null);
+  const [dragOverColumnId, setDragOverColumnId] = useState<number | null>(null);
   const [collaborationOpen, setCollaborationOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [commentingTask, setCommentingTask] = useState<KanbanTaskDTO | null>(null);
@@ -306,7 +327,13 @@ export function KanbanWorkspace({ initialBoards, categories }: { initialBoards: 
     });
   }
 
+  function trackTaskDrag(taskId: number | null) {
+    setDraggingTaskId(taskId);
+    if (taskId === null) setDragOverColumnId(null);
+  }
+
   function dropTask(columnId: number, position: number) {
+    setDragOverColumnId(null);
     if (!draggingTaskId) return;
     setError("");
     const taskId = draggingTaskId;
@@ -340,31 +367,61 @@ export function KanbanWorkspace({ initialBoards, categories }: { initialBoards: 
               <p className="mt-1 text-xs leading-5 text-muted-foreground">Create a board to begin shaping your tasks.</p>
             </div>
           ) : (
-            boards.map((board) => (
-              <div key={board.id} className="group flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setSelectedBoardId(board.id)}
+            boards.map((board) => {
+              const isActive = selectedBoard?.id === board.id;
+              const taskCount = board.columns.reduce((count, column) => count + column.tasks.length, 0);
+
+              return (
+                <div
+                  key={board.id}
                   className={cn(
-                    "flex h-11 min-w-0 flex-1 items-center gap-2 rounded-lg px-3 text-left text-sm font-medium transition-colors",
-                    selectedBoard?.id === board.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                    "group relative flex items-center gap-1 rounded-xl border pl-3 pr-1 transition-all duration-150",
+                    isActive
+                      ? "border-primary/30 bg-primary/[0.07] shadow-sm"
+                      : "border-transparent hover:border-border hover:bg-accent/50",
                   )}
                 >
-                  <span className={cn("size-2.5 shrink-0 rounded-full", boardStyles[board.color].dot)} aria-hidden="true" />
-                  <span className="truncate">{board.name}</span>
-                </button>
-                {board.canManage && (
-                  <>
-                    <Button variant="ghost" size="icon" className="size-8 rounded-lg opacity-100 sm:opacity-0 sm:group-hover:opacity-100" onClick={() => openEditBoard(board)}>
-                      <Pencil className="size-3.5" aria-hidden="true" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="size-8 rounded-lg text-muted-foreground hover:text-destructive" onClick={() => removeBoard(board.id)}>
-                      <Trash2 className="size-3.5" aria-hidden="true" />
-                    </Button>
-                  </>
-                )}
-              </div>
-            ))
+                  <span
+                    className={cn(
+                      "absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full transition-opacity",
+                      boardStyles[board.color].dot,
+                      isActive ? "opacity-100" : "opacity-0",
+                    )}
+                    aria-hidden="true"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setSelectedBoardId(board.id)}
+                    className={cn(
+                      "flex h-11 min-w-0 flex-1 items-center gap-2.5 text-left text-sm font-medium transition-colors",
+                      isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground",
+                    )}
+                  >
+                    <span className={cn("size-2.5 shrink-0 rounded-full", boardStyles[board.color].dot)} aria-hidden="true" />
+                    <span className="truncate">{board.name}</span>
+                    <span className="ml-auto shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-muted-foreground group-hover:hidden">
+                      {taskCount}
+                    </span>
+                  </button>
+                  {board.canManage && (
+                    <div className="flex shrink-0 items-center opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
+                      <Button variant="ghost" size="icon" className="size-8 rounded-lg" onClick={() => openEditBoard(board)} aria-label={`Edit ${board.name}`}>
+                        <Pencil className="size-3.5" aria-hidden="true" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 rounded-lg text-muted-foreground hover:text-destructive"
+                        onClick={() => removeBoard(board.id)}
+                        aria-label={`Delete ${board.name}`}
+                      >
+                        <Trash2 className="size-3.5" aria-hidden="true" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              );
+            })
           )}
         </CardContent>
       </Card>
@@ -382,9 +439,17 @@ export function KanbanWorkspace({ initialBoards, categories }: { initialBoards: 
                       <span className={cn("size-3 shrink-0 rounded-full", boardStyles[selectedBoard.color].dot)} aria-hidden="true" />
                       <CardTitle className="truncate text-xl">{selectedBoard.name}</CardTitle>
                     </div>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {selectedBoard.columns.length}/5 columns · {selectedBoard.columns.reduce((count, column) => count + column.tasks.length, 0)} tasks
-                    </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                      <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+                        {selectedBoard.columns.length}/5 columns
+                      </span>
+                      <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+                        {selectedBoard.columns.reduce((count, column) => count + column.tasks.length, 0)} tasks
+                      </span>
+                      <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-semibold", boardStyles[selectedBoard.color].chip)}>
+                        {boardStyles[selectedBoard.color].label}
+                      </span>
+                    </div>
                     <ActiveCollaborators board={selectedBoard} />
                   </div>
                   <div className="flex w-full flex-col gap-2 sm:w-auto">
@@ -430,12 +495,16 @@ export function KanbanWorkspace({ initialBoards, categories }: { initialBoards: 
                 </div>
               </CardHeader>
 
-              <CardContent className="min-h-0 flex-1 p-4 pt-0 sm:p-5 sm:pt-0">
+              <CardContent className="min-h-0 flex-1 border-t border-border bg-background/50 p-4 sm:p-5">
                 <div className="flex h-full min-w-0 gap-4 overflow-x-auto pb-2">
                   {selectedBoard.columns.map((column) => (
                     <KanbanColumn
                       key={column.id}
                       column={column}
+                      accent={selectedBoard.color}
+                      draggingTaskId={draggingTaskId}
+                      isDropTarget={dragOverColumnId === column.id}
+                      onDragOverColumn={setDragOverColumnId}
                       onAddTask={openCreateTask}
                       onEditColumn={(nextColumn) => {
                         setEditingColumnId(nextColumn.id);
@@ -445,7 +514,7 @@ export function KanbanWorkspace({ initialBoards, categories }: { initialBoards: 
                       onEditTask={openEditTask}
                       onOpenComments={setCommentingTask}
                       onDeleteTask={removeTask}
-                      onDragTask={setDraggingTaskId}
+                      onDragTask={trackTaskDrag}
                       onDropTask={dropTask}
                     />
                   ))}
@@ -680,6 +749,10 @@ export function KanbanWorkspace({ initialBoards, categories }: { initialBoards: 
 
 function KanbanColumn({
   column,
+  accent,
+  draggingTaskId,
+  isDropTarget,
+  onDragOverColumn,
   onAddTask,
   onEditColumn,
   onDeleteColumn,
@@ -690,6 +763,10 @@ function KanbanColumn({
   onDropTask,
 }: {
   column: KanbanColumnDTO;
+  accent: BoardColor;
+  draggingTaskId: number | null;
+  isDropTarget: boolean;
+  onDragOverColumn: (columnId: number | null) => void;
   onAddTask: (columnId: number) => void;
   onEditColumn: (column: KanbanColumnDTO) => void;
   onDeleteColumn: (columnId: number) => void;
@@ -699,52 +776,108 @@ function KanbanColumn({
   onDragTask: (taskId: number | null) => void;
   onDropTask: (columnId: number, position: number) => void;
 }) {
+  const [dropIndex, setDropIndex] = useState<number | null>(null);
+  const isDragging = draggingTaskId !== null;
+
+  // A single source of truth for the insertion point: cards claim their own index, the empty space below claims the end.
+  function hoverAt(index: number) {
+    setDropIndex(index);
+    onDragOverColumn(column.id);
+  }
+
+  function clearHover() {
+    setDropIndex(null);
+    onDragOverColumn(null);
+  }
+
   return (
     <section
-      className="flex min-h-0 w-[19rem] shrink-0 flex-col rounded-lg border border-border bg-background shadow-sm"
-      onDragOver={(event) => event.preventDefault()}
+      className={cn(
+        "group/column flex min-h-0 w-[19rem] shrink-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-colors duration-150",
+        isDropTarget ? "border-primary ring-2 ring-primary/25" : "border-border",
+      )}
+      onDragOver={(event) => {
+        event.preventDefault();
+        hoverAt(column.tasks.length);
+      }}
+      onDragLeave={(event) => {
+        // dragleave also fires when the cursor moves onto a card inside the column, which would flicker the highlight.
+        if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
+        clearHover();
+      }}
       onDrop={(event) => {
         event.preventDefault();
-        onDropTask(column.id, column.tasks.length);
+        const position = dropIndex ?? column.tasks.length;
+        clearHover();
+        onDropTask(column.id, position);
       }}
     >
-      <div className="flex items-center justify-between gap-2 border-b border-border p-3">
-        <div className="min-w-0">
+      <span className={cn("h-1 w-full shrink-0", boardStyles[accent].dot)} aria-hidden="true" />
+      <div className="flex items-center justify-between gap-2 border-b border-border bg-card px-3 py-2.5">
+        <div className="flex min-w-0 items-center gap-2">
           <h2 className="truncate text-sm font-semibold">{column.name}</h2>
-          <p className="text-xs text-muted-foreground">{column.tasks.length} tasks</p>
+          <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold tabular-nums text-muted-foreground">
+            {column.tasks.length}
+          </span>
         </div>
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="flex shrink-0 items-center">
           <Button variant="ghost" size="icon" className="size-8 rounded-lg" onClick={() => onAddTask(column.id)} aria-label={`Add task to ${column.name}`}>
             <Plus className="size-4 text-primary" aria-hidden="true" />
           </Button>
-          <Button variant="ghost" size="icon" className="size-8 rounded-lg" onClick={() => onEditColumn(column)} aria-label={`Edit ${column.name}`}>
-            <Pencil className="size-3.5" aria-hidden="true" />
-          </Button>
-          <Button variant="ghost" size="icon" className="size-8 rounded-lg text-muted-foreground hover:text-destructive" onClick={() => onDeleteColumn(column.id)} aria-label={`Delete ${column.name}`}>
-            <Trash2 className="size-3.5" aria-hidden="true" />
-          </Button>
+          <div className="flex items-center opacity-100 transition-opacity sm:opacity-0 sm:group-hover/column:opacity-100">
+            <Button variant="ghost" size="icon" className="size-8 rounded-lg" onClick={() => onEditColumn(column)} aria-label={`Edit ${column.name}`}>
+              <Pencil className="size-3.5" aria-hidden="true" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-8 rounded-lg text-muted-foreground hover:text-destructive"
+              onClick={() => onDeleteColumn(column.id)}
+              aria-label={`Delete ${column.name}`}
+            >
+              <Trash2 className="size-3.5" aria-hidden="true" />
+            </Button>
+          </div>
         </div>
       </div>
-      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
+      <div
+        className={cn(
+          "flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3 transition-colors [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          isDropTarget ? "bg-primary/[0.06]" : "bg-background/60",
+        )}
+      >
         {column.tasks.map((task, index) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            onEdit={() => onEditTask(task)}
-            onOpenComments={() => onOpenComments(task)}
-            onDelete={() => onDeleteTask(task.id)}
-            onDragTask={onDragTask}
-            onDropBefore={() => onDropTask(column.id, index)}
-          />
+          <div key={task.id} className="relative">
+            <DropIndicator active={isDragging && dropIndex === index} />
+            <TaskCard
+              task={task}
+              isDragging={draggingTaskId === task.id}
+              onEdit={() => onEditTask(task)}
+              onOpenComments={() => onOpenComments(task)}
+              onDelete={() => onDeleteTask(task.id)}
+              onDragTask={onDragTask}
+              onHover={() => hoverAt(index)}
+            />
+          </div>
         ))}
+        {column.tasks.length > 0 && (
+          <div className="relative h-1 shrink-0">
+            <DropIndicator active={isDragging && dropIndex === column.tasks.length} />
+          </div>
+        )}
         {column.tasks.length === 0 && (
           <button
             type="button"
             onClick={() => onAddTask(column.id)}
-            className="flex min-h-28 items-center justify-center rounded-lg border border-dashed border-border bg-card text-sm font-medium text-muted-foreground transition hover:bg-accent hover:text-foreground"
+            className={cn(
+              "flex min-h-28 flex-1 items-center justify-center rounded-xl border border-dashed text-sm font-medium transition-colors",
+              isDropTarget
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground",
+            )}
           >
             <Plus className="mr-2 size-4" aria-hidden="true" />
-            Add task
+            {isDropTarget ? "Drop here" : "Add task"}
           </button>
         )}
       </div>
@@ -752,26 +885,41 @@ function KanbanColumn({
   );
 }
 
+function DropIndicator({ active }: { active: boolean }) {
+  return (
+    <span
+      className={cn(
+        "pointer-events-none absolute inset-x-0 -top-1 flex h-0.5 items-center rounded-full bg-primary transition-opacity duration-150",
+        active ? "opacity-100" : "opacity-0",
+      )}
+      aria-hidden="true"
+    />
+  );
+}
+
 function TaskCard({
   task,
+  isDragging,
   onEdit,
   onOpenComments,
   onDelete,
   onDragTask,
-  onDropBefore,
+  onHover,
 }: {
   task: KanbanTaskDTO;
+  isDragging: boolean;
   onEdit: () => void;
   onOpenComments: () => void;
   onDelete: () => void;
   onDragTask: (taskId: number | null) => void;
-  onDropBefore: () => void;
+  onHover: () => void;
 }) {
   const { threads } = useThreads({
     query: { metadata: { kind: "kanban-task", taskId: task.id } },
     scrollOnLoad: false,
   });
   const commentCount = threads?.reduce((count, thread) => count + thread.comments.filter((comment) => !comment.deletedAt).length, 0) ?? 0;
+  const due = dueDateStatus(task.dueDate);
 
   return (
     <article
@@ -781,16 +929,22 @@ function TaskCard({
         onDragTask(task.id);
       }}
       onDragEnd={() => onDragTask(null)}
-      onDragOver={(event) => event.preventDefault()}
-      onDrop={(event) => {
+      onDragOver={(event) => {
         event.preventDefault();
         event.stopPropagation();
-        onDropBefore();
+        onHover();
       }}
-      className="group rounded-lg border border-border bg-card p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      className={cn(
+        "group rounded-xl border border-l-4 border-border bg-card p-3 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md",
+        priorityAccents[task.priority],
+        isDragging && "opacity-40",
+      )}
     >
       <div className="flex items-start gap-2">
-        <GripVertical className="mt-1 size-4 shrink-0 cursor-grab text-muted-foreground" aria-hidden="true" />
+        <GripVertical
+          className="mt-0.5 size-4 shrink-0 cursor-grab text-muted-foreground opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100"
+          aria-hidden="true"
+        />
         <button type="button" onClick={onEdit} className="min-w-0 flex-1 text-left">
           <h3 className="line-clamp-2 text-sm font-semibold leading-5">{task.title}</h3>
           {task.description && <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground">{task.description}</p>}
@@ -799,9 +953,12 @@ function TaskCard({
           <MoreHorizontal className="size-4" aria-hidden="true" />
         </Button>
       </div>
-      <div className="mt-3 flex flex-wrap gap-1.5">
+      <div className="mt-2.5 flex flex-wrap gap-1.5">
         <span className={cn("rounded-md border px-2 py-0.5 text-[11px] font-semibold capitalize", priorityStyles[task.priority])}>{task.priority}</span>
-        <span className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">{task.dueDate}</span>
+        <span className={cn("flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium", due.className)}>
+          <CalendarDays className="size-3" aria-hidden="true" />
+          {due.label}
+        </span>
         {task.category && (
           <span className="rounded-md border border-primary/20 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
             {task.category}
@@ -813,7 +970,7 @@ function TaskCard({
           </span>
         ))}
       </div>
-      <div className="mt-3 flex items-center justify-between gap-2">
+      <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-border/60 pt-2.5">
         <div className="flex items-center gap-1.5">
           {task.syncCalendar && (
             <span className="flex size-7 items-center justify-center rounded-lg bg-sage-100 text-sage-700" title="Synced with Calendar">
