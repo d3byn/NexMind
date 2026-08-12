@@ -473,37 +473,52 @@ export function WhiteboardWorkspace({ initialBoards }: { initialBoards: Whiteboa
 
   if (!selectedBoard) {
     return (
-      <div className="flex min-h-0 flex-1 items-center justify-center text-sm text-muted-foreground">
-        No whiteboards yet.
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-6 text-center">
+        <div className="flex size-14 items-center justify-center rounded-2xl bg-clay-100 text-clay-700">
+          <StickyNote className="size-7" aria-hidden="true" />
+        </div>
+        <h2 className="mt-4 text-lg font-semibold">No whiteboards yet</h2>
+        <p className="mt-1.5 max-w-sm text-sm leading-6 text-muted-foreground">
+          Create a board to sketch diagrams, map ideas, and drop sticky notes.
+        </p>
+        <Button className="mt-5 rounded-lg" onClick={createBoard} disabled={isPending}>
+          <Plus className="mr-2 size-4" aria-hidden="true" />
+          New whiteboard
+        </Button>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-0 flex-1 overflow-hidden">
-      <aside className="flex w-72 shrink-0 flex-col border-r border-border bg-sidebar/95 max-md:w-64 max-sm:hidden">
-        <div className="flex items-center justify-between gap-3 border-b border-border p-3">
-          <div className="min-w-0">
+      <aside className="flex w-72 shrink-0 flex-col border-r border-border bg-card max-md:w-64 max-sm:hidden">
+        <div className="shrink-0 border-b border-border p-3">
+          <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-semibold text-foreground">Whiteboards</p>
-            <p className="text-xs text-muted-foreground">{boards.length} board{boards.length === 1 ? "" : "s"}</p>
+            <Button size="sm" className="gap-1.5 rounded-lg" onClick={createBoard} disabled={isPending}>
+              <Plus className="size-3.5" aria-hidden="true" />
+              New
+            </Button>
           </div>
-          <Button size="sm" className="gap-1.5 rounded-lg" onClick={createBoard} disabled={isPending}>
-            <Plus className="size-3.5" aria-hidden="true" />
-            New
-          </Button>
+          <span className="mt-2 inline-flex rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold tabular-nums text-muted-foreground">
+            {boards.length} board{boards.length === 1 ? "" : "s"}
+          </span>
         </div>
 
-        <div className="min-h-0 flex-1 space-y-1 overflow-y-auto p-2">
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-background/50 p-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {boards.map((board) => {
             const selected = board.id === selectedBoard.id;
             return (
               <div
                 key={board.id}
                 className={cn(
-                  "group rounded-lg border border-transparent p-2 transition",
-                  selected ? "border-primary/20 bg-primary/10" : "hover:border-border hover:bg-card",
+                  "group relative overflow-hidden rounded-xl border p-2 pl-3 shadow-sm transition-all duration-150",
+                  selected
+                    ? "border-primary/40 bg-primary/[0.07] ring-1 ring-primary/20"
+                    : "border-border bg-card hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md",
                 )}
               >
+                <span className={cn("absolute inset-y-2 left-0 w-1 rounded-r-full", boardStyles[board.color].dot)} aria-hidden="true" />
                 {editingBoardId === board.id ? (
                   <form className="flex items-center gap-1" onSubmit={submitRename}>
                     <input
@@ -527,44 +542,43 @@ export function WhiteboardWorkspace({ initialBoards }: { initialBoards: Whiteboa
                     </Button>
                   </form>
                 ) : (
-                  <button
-                    type="button"
-                    className="flex w-full min-w-0 items-center gap-2 text-left"
-                    onClick={() => {
-                      setSelectedBoardId(board.id);
-                      setSaveStatus("saved");
-                    }}
-                  >
-                    <span className={cn("size-2.5 shrink-0 rounded-full", boardStyles[board.color].dot)} />
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium text-foreground">{board.name}</span>
-                      <span className="block text-xs text-muted-foreground">{relativeTime(board.updatedAt)}</span>
-                    </span>
-                  </button>
-                )}
-                {editingBoardId !== board.id && (
-                  <div className="mt-2 flex justify-end gap-1 opacity-0 transition group-hover:opacity-100">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="size-7"
-                      aria-label="Rename whiteboard"
+                  <div className="flex min-w-0 items-center gap-1">
+                    <button
+                      type="button"
+                      className="flex min-w-0 flex-1 items-center gap-2 py-0.5 text-left"
                       onClick={() => {
-                        setEditingBoardId(board.id);
-                        setEditingName(board.name);
+                        setSelectedBoardId(board.id);
+                        setSaveStatus("saved");
                       }}
                     >
-                      <FilePenLine className="size-3.5" aria-hidden="true" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="size-7 text-destructive hover:text-destructive"
-                      aria-label="Delete whiteboard"
-                      onClick={() => removeBoard(board.id)}
-                    >
-                      <Trash2 className="size-3.5" aria-hidden="true" />
-                    </Button>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium text-foreground">{board.name}</span>
+                        <span className="block text-xs text-muted-foreground">{relativeTime(board.updatedAt)}</span>
+                      </span>
+                    </button>
+                    <div className="flex shrink-0 items-center opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="size-7 rounded-lg"
+                        aria-label="Rename whiteboard"
+                        onClick={() => {
+                          setEditingBoardId(board.id);
+                          setEditingName(board.name);
+                        }}
+                      >
+                        <FilePenLine className="size-3.5" aria-hidden="true" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="size-7 rounded-lg text-muted-foreground hover:text-destructive"
+                        aria-label="Delete whiteboard"
+                        onClick={() => removeBoard(board.id)}
+                      >
+                        <Trash2 className="size-3.5" aria-hidden="true" />
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -580,9 +594,25 @@ export function WhiteboardWorkspace({ initialBoards }: { initialBoards: Whiteboa
               <span className={cn("size-2.5 rounded-full", boardStyles[selectedBoard.color].dot)} />
               <h1 className="truncate text-sm font-semibold text-foreground">{selectedBoard.name}</h1>
             </div>
-            <p className="text-xs text-muted-foreground">
+            <span
+              className={cn(
+                "mt-1 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold",
+                saveStatus === "error"
+                  ? "bg-destructive/10 text-destructive"
+                  : saveStatus === "saving"
+                    ? "bg-amber-100 text-amber-800"
+                    : "bg-sage-100 text-sage-800",
+              )}
+            >
+              <span
+                className={cn(
+                  "size-1.5 rounded-full",
+                  saveStatus === "error" ? "bg-destructive" : saveStatus === "saving" ? "animate-pulse bg-amber-600" : "bg-sage-600",
+                )}
+                aria-hidden="true"
+              />
               {saveStatus === "saving" ? "Saving..." : saveStatus === "error" ? "Could not save" : "Saved"}
-            </p>
+            </span>
           </div>
 
           <Button variant="outline" size="sm" className="gap-1.5 rounded-lg" onClick={addStickyNote}>
@@ -632,7 +662,8 @@ export function WhiteboardWorkspace({ initialBoards }: { initialBoards: Whiteboa
           </div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-hidden bg-card">
+        {/* The canvas sits inset on the page background so it reads as a framed surface rather than bleeding to the edges. */}
+        <div className="m-3 min-h-0 flex-1 overflow-hidden rounded-xl border border-border bg-card shadow-sm">
           <Canvas
             board={selectedBoard}
             onApi={(api) => (apiRef.current = api)}
@@ -645,7 +676,7 @@ export function WhiteboardWorkspace({ initialBoards }: { initialBoards: Whiteboa
 
       {aiOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/35 p-4" role="dialog" aria-modal="true" aria-labelledby="ai-diagram-title">
-          <form className="w-full max-w-lg rounded-lg border border-border bg-popover p-4 shadow-2xl" onSubmit={submitAi}>
+          <form className="w-full max-w-lg rounded-xl border border-border bg-popover p-5 shadow-2xl" onSubmit={submitAi}>
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 id="ai-diagram-title" className="text-base font-semibold text-foreground">
