@@ -170,7 +170,7 @@ function SidebarNavItem({ item, active, collapsed }: { item: NavItem; active: bo
                     aria-hidden="true"
                 />
             )}
-            <span
+            <div
                 className={cn(
                     "flex size-7 shrink-0 items-center justify-center rounded-lg shadow-sm transition-all duration-200 group-hover:scale-110",
                     item.gradient,
@@ -179,7 +179,7 @@ function SidebarNavItem({ item, active, collapsed }: { item: NavItem; active: bo
                 )}
             >
                 <Icon ref={iconRef} size={16} duration={1} color="#ffffff" isAnimated />
-            </span>
+            </div>
             <span
                 className={cn(
                     "min-w-0 truncate transition-[opacity,transform] ease-[cubic-bezier(0.32,0.72,0,1)]",

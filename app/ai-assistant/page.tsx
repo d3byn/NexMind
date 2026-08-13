@@ -22,10 +22,10 @@ export default async function AiAssistantPage() {
         <AppShell activePage="ai-assistant" generatedSidebarApps={sidebarApps}>
             <section className="mx-auto flex h-full min-h-0 w-full max-w-[104rem] flex-col px-4 py-5 sm:px-6 lg:px-8">
                 <header className="flex shrink-0 flex-col gap-2 border-b border-border pb-4">
-                    <p className="flex items-center gap-2 text-sm font-medium text-primary">
+                    <div className="flex items-center gap-2 text-sm font-medium text-primary">
                         <PageIcon icon={pageIcons["ai-assistant"].icon} gradient={pageIcons["ai-assistant"].gradient} glow={pageIcons["ai-assistant"].glow} size="sm" />
                         AI Assistant
-                    </p>
+                    </div>
                     <h1 className="text-2xl font-semibold leading-tight text-foreground sm:text-3xl">
                         Chat, plan, and act across your workspace.
                     </h1>

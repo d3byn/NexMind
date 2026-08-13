@@ -28,10 +28,10 @@ export default async function KanbanPage() {
             <section className="mx-auto flex w-full max-w-[96rem] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
                 <header className="border-b border-border pb-4">
                     <div className="min-w-0">
-                        <p className="flex items-center gap-2 text-sm font-medium text-primary">
+                        <div className="flex items-center gap-2 text-sm font-medium text-primary">
                             <PageIcon icon={pageIcons["kanban"].icon} gradient={pageIcons["kanban"].gradient} glow={pageIcons["kanban"].glow} size="sm" />
                             Task / Kanban
-                        </p>
+                        </div>
                         <h1 className="mt-1.5 text-2xl font-semibold leading-tight text-foreground">
                             Shape the work as it moves.
                         </h1>

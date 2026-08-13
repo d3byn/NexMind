@@ -26,10 +26,10 @@ export default async function WhiteboardPage() {
         <AppShell activePage="whiteboard" generatedSidebarApps={sidebarApps}>
             <section className="flex h-screen min-h-[46rem] w-full flex-col overflow-hidden">
                 <header className="shrink-0 border-b border-border px-4 py-3 sm:px-5">
-                    <p className="flex items-center gap-2 text-sm font-medium text-primary">
+                    <div className="flex items-center gap-2 text-sm font-medium text-primary">
                         <PageIcon icon={pageIcons["whiteboard"].icon} gradient={pageIcons["whiteboard"].gradient} glow={pageIcons["whiteboard"].glow} size="sm" />
                         Whiteboard
-                    </p>
+                    </div>
                 </header>
 
                 <WhiteboardWorkspace initialBoards={boards} />

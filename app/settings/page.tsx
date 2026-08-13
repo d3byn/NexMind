@@ -22,10 +22,10 @@ export default async function SettingsPage() {
         <AppShell activePage="settings" generatedSidebarApps={sidebarApps}>
             <section className="mx-auto flex w-full max-w-[92rem] flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
                 <header className="flex flex-col gap-3 border-b border-border pb-5">
-                    <p className="flex items-center gap-2 text-sm font-medium text-primary">
+                    <div className="flex items-center gap-2 text-sm font-medium text-primary">
                         <PageIcon icon={pageIcons["settings"].icon} gradient={pageIcons["settings"].gradient} glow={pageIcons["settings"].glow} size="sm" />
                         Settings
-                    </p>
+                    </div>
                     <div>
                         <h1 className="text-2xl font-semibold leading-tight text-foreground">Tune your NexMind workspace.</h1>
                         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">

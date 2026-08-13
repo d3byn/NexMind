@@ -22,10 +22,10 @@ export default async function AiTemplateBuilderPage() {
             <section className="mx-auto flex w-full max-w-[104rem] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
                 <header className="flex flex-col gap-4 border-b border-border pb-6 lg:flex-row lg:items-center lg:justify-between">
                     <div className="min-w-0">
-                        <p className="flex items-center gap-2 text-sm font-medium text-primary">
+                        <div className="flex items-center gap-2 text-sm font-medium text-primary">
                             <PageIcon icon={pageIcons["ai-template-builder"].icon} gradient={pageIcons["ai-template-builder"].gradient} glow={pageIcons["ai-template-builder"].glow} size="sm" />
                             AI Template Builder
-                        </p>
+                        </div>
                         <h1 className="mt-2 text-3xl font-semibold leading-tight text-foreground">
                             Turn a prompt into a single-page productivity app.
                         </h1>

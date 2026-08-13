@@ -46,6 +46,30 @@
   --color-eclipse-700: var(--eclipse-700);
   --color-eclipse-800: var(--eclipse-800);
   --color-eclipse-900: var(--eclipse-900);
+  --color-violet-50: var(--violet-50);
+  --color-violet-100: var(--violet-100);
+  --color-violet-200: var(--violet-200);
+  --color-violet-400: var(--violet-400);
+  --color-violet-500: var(--violet-500);
+  --color-violet-600: var(--violet-600);
+  --color-violet-700: var(--violet-700);
+  --color-violet-800: var(--violet-800);
+  --color-sky-50: var(--sky-50);
+  --color-sky-100: var(--sky-100);
+  --color-sky-200: var(--sky-200);
+  --color-sky-400: var(--sky-400);
+  --color-sky-500: var(--sky-500);
+  --color-sky-600: var(--sky-600);
+  --color-sky-700: var(--sky-700);
+  --color-sky-800: var(--sky-800);
+  --color-rose-50: var(--rose-50);
+  --color-rose-100: var(--rose-100);
+  --color-rose-200: var(--rose-200);
+  --color-rose-400: var(--rose-400);
+  --color-rose-500: var(--rose-500);
+  --color-rose-600: var(--rose-600);
+  --color-rose-700: var(--rose-700);
+  --color-rose-800: var(--rose-800);
   --color-clay-100: var(--clay-100);
   --color-clay-200: var(--clay-200);
   --color-clay-400: var(--clay-400);
@@ -137,12 +161,37 @@
   --input: hsl(244 48% 89%);
   --ring: hsl(248 72% 60%);
   --sidebar: hsl(248 62% 98.5%);
+  --hero-gradient: linear-gradient(180deg, hsl(250 78% 98%) 0%, hsl(0 0% 100% / 0.8) 58%, hsl(250 78% 98%) 100%);
   --app-gradient:
     radial-gradient(1250px 850px at 8% -12%, hsl(258 92% 88% / 0.62), transparent 62%),
     radial-gradient(1050px 750px at 96% 2%, hsl(192 92% 86% / 0.5), transparent 58%),
     radial-gradient(1000px 780px at 46% 112%, hsl(330 92% 90% / 0.5), transparent 60%),
     radial-gradient(760px 620px at 78% 68%, hsl(158 82% 88% / 0.34), transparent 62%),
     linear-gradient(168deg, hsl(250 78% 98.5%) 0%, hsl(244 62% 97.5%) 46%, hsl(262 66% 97.5%) 100%);
+  --violet-50: #F5F3FF;
+  --violet-100: #EDE9FE;
+  --violet-200: #DDD6FE;
+  --violet-400: #A78BFA;
+  --violet-500: #8B5CF6;
+  --violet-600: #7C3AED;
+  --violet-700: #6D28D9;
+  --violet-800: #5B21B6;
+  --sky-50: #F0F9FF;
+  --sky-100: #E0F2FE;
+  --sky-200: #BAE6FD;
+  --sky-400: #38BDF8;
+  --sky-500: #0EA5E9;
+  --sky-600: #0284C7;
+  --sky-700: #0369A1;
+  --sky-800: #075985;
+  --rose-50: #FFF1F2;
+  --rose-100: #FFE4E6;
+  --rose-200: #FECDD3;
+  --rose-400: #FB7185;
+  --rose-500: #F43F5E;
+  --rose-600: #E11D48;
+  --rose-700: #BE123C;
+  --rose-800: #9F1239;
   --clay-100: hsl(348 100% 95%);
   --clay-200: hsl(348 92% 87%);
   --clay-400: hsl(348 88% 67%);
@@ -166,6 +215,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --background: hsl(243 58% 8.5%);
   --foreground: hsl(246 50% 95%);
   --card: hsl(243 48% 14%);
@@ -187,6 +237,7 @@
   --input: hsl(245 32% 27%);
   --ring: hsl(250 88% 72%);
   --sidebar: hsl(243 54% 10.5%);
+  --hero-gradient: linear-gradient(180deg, hsl(246 52% 11%) 0%, hsl(243 48% 14% / 0.85) 58%, hsl(246 52% 11%) 100%);
   --app-gradient:
     radial-gradient(1250px 850px at 8% -12%, hsl(258 80% 42% / 0.4), transparent 62%),
     radial-gradient(1050px 750px at 96% 2%, hsl(192 82% 34% / 0.3), transparent 58%),
@@ -202,6 +253,41 @@
   --amber-100: hsl(36 45% 20%);
   --amber-200: hsl(36 45% 28%);
   --amber-800: hsl(44 88% 84%);
+  --clay-400: hsl(348 84% 70%);
+  --clay-600: hsl(348 86% 66%);
+  --clay-700: hsl(348 80% 74%);
+  --sage-400: hsl(158 60% 55%);
+  --sage-600: hsl(158 62% 52%);
+  --sage-700: hsl(158 58% 62%);
+  --amber-400: hsl(42 94% 62%);
+  --amber-600: hsl(42 92% 60%);
+  --amber-700: hsl(44 88% 70%);
+  --coral-500: hsl(250 88% 74%);
+  --eclipse-500: hsl(246 30% 70%);
+  --violet-50: hsl(258 40% 15%);
+  --violet-100: hsl(258 40% 20%);
+  --violet-200: hsl(258 38% 28%);
+  --violet-400: hsl(258 80% 74%);
+  --violet-500: hsl(258 82% 70%);
+  --violet-600: hsl(258 78% 74%);
+  --violet-700: hsl(258 72% 82%);
+  --violet-800: hsl(258 72% 88%);
+  --sky-50: hsl(200 45% 13%);
+  --sky-100: hsl(200 45% 18%);
+  --sky-200: hsl(200 40% 26%);
+  --sky-400: hsl(198 85% 64%);
+  --sky-500: hsl(198 88% 60%);
+  --sky-600: hsl(198 85% 66%);
+  --sky-700: hsl(198 82% 78%);
+  --sky-800: hsl(198 82% 86%);
+  --rose-50: hsl(348 40% 15%);
+  --rose-100: hsl(348 40% 20%);
+  --rose-200: hsl(348 38% 28%);
+  --rose-400: hsl(348 84% 72%);
+  --rose-500: hsl(348 86% 68%);
+  --rose-600: hsl(348 84% 72%);
+  --rose-700: hsl(348 80% 82%);
+  --rose-800: hsl(348 80% 88%);
 }
 
 @layer base {

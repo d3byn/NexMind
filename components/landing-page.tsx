@@ -503,7 +503,7 @@ export function LandingPage() {
                 </nav>
             </header>
 
-            <section className="relative border-b border-border/70 bg-[linear-gradient(180deg,hsl(240_40%_97%)_0%,hsl(0_0%_100%/.8)_58%,hsl(240_40%_97%)_100%)]">
+            <section className="relative border-b border-border/70 bg-[image:var(--hero-gradient)]">
                 <div className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-20">
                     <div className="max-w-3xl">
                         <div className="flex flex-wrap gap-2">

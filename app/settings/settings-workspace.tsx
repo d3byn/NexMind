@@ -33,7 +33,7 @@ import {
   Users,
   WandSparkles,
 } from "lucide-react";
-import { FormEvent, ReactNode, useMemo, useState, useTransition } from "react";
+import { FormEvent, ReactNode, useEffect, useMemo, useState, useTransition } from "react";
 
 import {
   createCategory,
@@ -48,6 +48,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { CategoryScope, UserCategoryDTO } from "@/lib/user-preferences";
+import { THEME_STORAGE_KEY, useTheme, type Theme } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 
 type SettingsSection = "profile" | "subscription" | "categories" | "ai" | "preferences" | "privacy";
@@ -130,6 +131,20 @@ export function SettingsWorkspace({ initialData }: { initialData: SettingsPageDa
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
+  const { resolvedTheme, setTheme } = useTheme();
+
+  
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.localStorage.getItem(THEME_STORAGE_KEY)) return;
+    setTheme(initialData.settings.theme as Theme);
+  }, [initialData.settings.theme, setTheme]);
+
+  function applyTheme(theme: string) {
+    setTheme(theme as Theme);
+    saveSettings({ theme });
+  }
+
 
   const categoriesByScope = useMemo(
     () =>
@@ -450,7 +465,13 @@ export function SettingsWorkspace({ initialData }: { initialData: SettingsPageDa
         {active === "preferences" && (
           <SettingsCard title="App Preferences" icon={Palette}>
             <div className="grid gap-4 lg:grid-cols-2">
-              <SelectSetting label="Theme" value={settings.theme} onChange={(theme) => saveSettings({ theme })} options={["system", "light", "dark"]} icon={settings.theme === "dark" ? Moon : Sun} />
+              <SelectSetting
+                label="Theme"
+                value={settings.theme}
+                onChange={applyTheme}
+                options={["system", "light", "dark"]}
+                icon={resolvedTheme === "dark" ? Moon : Sun}
+              />
               <SelectSetting label="Default calendar view" value={settings.defaultCalendarView} onChange={(defaultCalendarView) => saveSettings({ defaultCalendarView })} options={["month", "week"]} />
               <SelectSetting label="Default task priority" value={settings.defaultTaskPriority} onChange={(defaultTaskPriority) => saveSettings({ defaultTaskPriority })} options={["low", "medium", "high"]} />
               <ToggleSetting label="Auto-save" checked={settings.autoSaveEnabled} onChange={(autoSaveEnabled) => saveSettings({ autoSaveEnabled })} />

@@ -28,10 +28,10 @@ export default async function CalendarPage() {
             <section className="mx-auto flex w-full max-w-[95rem] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
                 <header className="flex flex-col gap-4 border-b border-border pb-6 lg:flex-row lg:items-center lg:justify-between">
                     <div className="min-w-0">
-                        <p className="flex items-center gap-2 text-sm font-medium text-primary">
+                        <div className="flex items-center gap-2 text-sm font-medium text-primary">
                             <PageIcon icon={pageIcons["calendar"].icon} gradient={pageIcons["calendar"].gradient} glow={pageIcons["calendar"].glow} size="sm" />
                             Calendar
-                        </p>
+                        </div>
                         <h1 className="mt-2 text-3xl font-semibold leading-tight text-foreground">
                             Schedule the work, hold the maybes.
                         </h1>

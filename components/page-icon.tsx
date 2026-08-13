@@ -27,7 +27,7 @@ export function PageIcon({
     const iconRef = useRef<AnimatedIconHandle>(null);
 
     return (
-        <span
+        <div
             onMouseEnter={() => iconRef.current?.startAnimation()}
             onMouseLeave={() => iconRef.current?.stopAnimation()}
             className={cn(
@@ -39,6 +39,6 @@ export function PageIcon({
             )}
         >
             <Icon ref={iconRef} size={size === "sm" ? 16 : 22} duration={1} color="#ffffff" isAnimated />
-        </span>
+        </div>
     );
 }
