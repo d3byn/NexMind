@@ -3,7 +3,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { currentUser } from "@clerk/nextjs/server";
 import { and, asc, eq, inArray, or } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 
 import {
   db,
@@ -402,7 +401,6 @@ export async function createSpace(input: SpaceInput) {
     updatedAt: new Date(),
   });
 
-  revalidatePath("/spaces");
   return buildSpacesData(user);
 }
 
@@ -422,7 +420,6 @@ export async function updateSpace(spaceId: number, input: Partial<SpaceInput> & 
     })
     .where(and(eq(spaces.id, spaceId), eq(spaces.userId, user.id)));
 
-  revalidatePath("/spaces");
   return buildSpacesData(user);
 }
 
@@ -430,7 +427,6 @@ export async function deleteSpace(spaceId: number) {
   const user = await getCurrentDatabaseUser();
   await assertSpaceOwner(spaceId, user.id);
   await db.delete(spaces).where(and(eq(spaces.id, spaceId), eq(spaces.userId, user.id)));
-  revalidatePath("/spaces");
   return buildSpacesData(user);
 }
 
@@ -467,7 +463,6 @@ export async function duplicateSpace(spaceId: number) {
     );
   }
 
-  revalidatePath("/spaces");
   return buildSpacesData(user);
 }
 
@@ -495,7 +490,6 @@ export async function inviteSpaceCollaborator(input: { spaceId: number; email: s
       set: { role: "editor", invitedByUserId: user.id, acceptedUserId: acceptedUser?.id ?? null, updatedAt: new Date() },
     });
 
-  revalidatePath("/spaces");
   return buildSpacesData(user);
 }
 
@@ -520,7 +514,6 @@ export async function createPage(input: PageInput) {
   });
   await db.update(spaces).set({ updatedAt: now }).where(eq(spaces.id, input.spaceId));
 
-  revalidatePath("/spaces");
   return buildSpacesData(user);
 }
 
@@ -551,7 +544,6 @@ export async function updatePage(pageId: number, input: Partial<PageInput> & { i
     .where(eq(spacePages.id, pageId));
 
   await db.update(spaces).set({ updatedAt: now }).where(or(eq(spaces.id, page.spaceId), eq(spaces.id, nextSpaceId)));
-  revalidatePath("/spaces");
   return buildSpacesData(user);
 }
 
@@ -573,7 +565,6 @@ export async function updatePageContent(pageId: number, input: PageContentInput)
     .where(and(eq(spacePages.id, pageId), eq(spacePages.isArchived, false)));
   await db.update(spaces).set({ updatedAt: now }).where(eq(spaces.id, page.spaceId));
 
-  revalidatePath("/spaces");
   return buildSpacesData(user);
 }
 
@@ -596,7 +587,6 @@ export async function duplicatePage(pageId: number) {
   });
   await db.update(spaces).set({ updatedAt: now }).where(eq(spaces.id, page.spaceId));
 
-  revalidatePath("/spaces");
   return buildSpacesData(user);
 }
 
@@ -605,7 +595,6 @@ export async function deletePage(pageId: number) {
   const { page } = await assertPageAccess(pageId, user);
   await db.delete(spacePages).where(eq(spacePages.id, pageId));
   await db.update(spaces).set({ updatedAt: new Date() }).where(eq(spaces.id, page.spaceId));
-  revalidatePath("/spaces");
   return buildSpacesData(user);
 }
 
@@ -620,7 +609,6 @@ export async function updatePageTaskLinks(pageId: number, taskIds: number[]) {
     await db.insert(pageTaskLinks).values(cleanIds.map((taskId) => ({ pageId, taskId })));
   }
 
-  revalidatePath("/spaces");
   return buildSpacesData(user);
 }
 

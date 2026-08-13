@@ -1,11 +1,9 @@
 "use server";
 
-import { currentUser } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 
-import { calendarItems, db, users } from "@/db";
-import { assertFreePlanLimit } from "@/lib/user-preferences";
+import { calendarItems, db } from "@/db";
+import { assertFreePlanLimit, getCurrentDatabaseUser } from "@/lib/user-preferences";
 
 const itemTypes = ["task", "reminder"] as const;
 
@@ -20,6 +18,7 @@ export type CalendarItemDTO = {
   category: CalendarCategory;
   scheduledDate: string | null;
   scheduledTime: string | null;
+  isAllDay: boolean;
   isDraft: boolean;
   createdAt: string;
   updatedAt: string;
@@ -32,6 +31,7 @@ export type CalendarItemInput = {
   category: string;
   scheduledDate?: string | null;
   scheduledTime?: string | null;
+  isAllDay?: boolean;
 };
 
 function normalizeType(value: string): CalendarItemType {
@@ -56,33 +56,17 @@ function toDTO(item: typeof calendarItems.$inferSelect): CalendarItemDTO {
     category: normalizeCategory(item.category),
     scheduledDate: item.scheduledDate,
     scheduledTime: item.scheduledTime,
+    isAllDay: item.isAllDay,
     isDraft: item.isDraft,
     createdAt: item.createdAt.toISOString(),
     updatedAt: item.updatedAt.toISOString(),
   };
 }
 
+// Delegates to the request-cached resolver so repeated calls in one request cost nothing.
 async function getCurrentDatabaseUserId() {
-  const user = await currentUser();
-  const email = user?.primaryEmailAddress?.emailAddress;
-  const clerkId = user?.id;
-
-  if (!email || !clerkId) {
-    throw new Error("You must be signed in to manage calendar items.");
-  }
-
-  const name = user.fullName || user.username || email.split("@")[0] || null;
-
-  const [databaseUser] = await db
-    .insert(users)
-    .values({ clerkId, email, name })
-    .onConflictDoUpdate({
-      target: users.clerkId,
-      set: { email, name },
-    })
-    .returning({ id: users.id });
-
-  return databaseUser.id;
+  const user = await getCurrentDatabaseUser();
+  return user.id;
 }
 
 export async function listCalendarItems() {
@@ -109,6 +93,8 @@ export async function createCalendarItem(input: CalendarItemInput, asDraft = fal
     throw new Error("Choose a date before scheduling this item.");
   }
 
+  const isAllDay = Boolean(input.isAllDay);
+
   const [item] = await db
     .insert(calendarItems)
     .values({
@@ -118,13 +104,13 @@ export async function createCalendarItem(input: CalendarItemInput, asDraft = fal
       itemType: normalizeType(input.itemType),
       category: normalizeCategory(input.category),
       scheduledDate,
-      scheduledTime: cleanOptionalText(input.scheduledTime),
+      scheduledTime: isAllDay ? null : cleanOptionalText(input.scheduledTime),
+      isAllDay,
       isDraft: asDraft,
       updatedAt: new Date(),
     })
     .returning();
 
-  revalidatePath("/calendar");
   return toDTO(item);
 }
 
@@ -142,6 +128,8 @@ export async function updateCalendarItem(id: number, input: CalendarItemInput, a
     throw new Error("Choose a date before scheduling this item.");
   }
 
+  const isAllDay = Boolean(input.isAllDay);
+
   const [item] = await db
     .update(calendarItems)
     .set({
@@ -150,7 +138,8 @@ export async function updateCalendarItem(id: number, input: CalendarItemInput, a
       itemType: normalizeType(input.itemType),
       category: normalizeCategory(input.category),
       scheduledDate,
-      scheduledTime: cleanOptionalText(input.scheduledTime),
+      scheduledTime: isAllDay ? null : cleanOptionalText(input.scheduledTime),
+      isAllDay,
       isDraft: asDraft,
       updatedAt: new Date(),
     })
@@ -161,8 +150,22 @@ export async function updateCalendarItem(id: number, input: CalendarItemInput, a
     throw new Error("Calendar item not found.");
   }
 
-  revalidatePath("/calendar");
   return toDTO(item);
+}
+
+export async function deleteCalendarItem(id: number) {
+  const userId = await getCurrentDatabaseUserId();
+
+  const [item] = await db
+    .delete(calendarItems)
+    .where(and(eq(calendarItems.id, id), eq(calendarItems.userId, userId)))
+    .returning({ id: calendarItems.id });
+
+  if (!item) {
+    throw new Error("Calendar item not found.");
+  }
+
+  return { id: item.id };
 }
 
 export async function scheduleCalendarItem(id: number, scheduledDate: string) {
@@ -187,6 +190,5 @@ export async function scheduleCalendarItem(id: number, scheduledDate: string) {
     throw new Error("Calendar item not found.");
   }
 
-  revalidatePath("/calendar");
   return toDTO(item);
 }

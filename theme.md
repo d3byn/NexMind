@@ -1,7 +1,7 @@
 # NexMind Cozy UI Theme
 
 ## Design Direction
-Flowbase should feel calm, capable, and fresh: a bright workspace for planning, writing, mapping ideas, and getting help from AI without visual clutter. The product UI opens directly into useful work surfaces rather than marketing sections.
+NexMind should feel calm, capable, and fresh: a bright workspace for planning, writing, mapping ideas, and getting help from AI without visual clutter. The product UI opens directly into useful work surfaces rather than marketing sections.
 
 ## Color Palette
 - Background: luminous warm off-white `hsl(42 82% 97%)` for a clean app canvas.

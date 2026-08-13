@@ -163,7 +163,7 @@ const features: IconItem[] = [
     },
     {
         title: "Custom Categories",
-        description: "Tune categories, labels, and settings so Flowbase mirrors how your team already thinks.",
+        description: "Tune categories, labels, and settings so NexMind mirrors how your team already thinks.",
         icon: Settings2,
         tone: "slate",
     },
@@ -247,7 +247,7 @@ const pricingPlans = [
 const testimonials = [
     {
         quote:
-            "Flowbase gives our team a single place to think, plan, and execute. The AI layer feels practical, not decorative.",
+            "NexMind gives our team a single place to think, plan, and execute. The AI layer feels practical, not decorative.",
         name: "Maya Chen",
         role: "Founder, Northstar Labs",
     },
@@ -277,9 +277,9 @@ const faqs = [
             "Teams can work together with shared boards, active presence, comments, and collaborative workspace updates powered by Liveblocks.",
     },
     {
-        question: "Can I use Flowbase for long-form notes?",
+        question: "Can I use NexMind for long-form notes?",
         answer:
-            "Yes. Flowbase includes a structured notes editor for specs, research, meeting notes, knowledge bases, and planning docs.",
+            "Yes. NexMind includes a structured notes editor for specs, research, meeting notes, knowledge bases, and planning docs.",
     },
     {
         question: "Is the whiteboard for diagrams or brainstorming?",
@@ -360,7 +360,7 @@ function MiniDashboardMockup() {
                     <div>
                         <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-primary">
                             <Sparkles className="size-3.5" aria-hidden="true" />
-                            Flowbase command center
+                            NexMind command center
                         </p>
                         <h3 className="mt-2 text-xl font-semibold">Launch workspace</h3>
                     </div>
@@ -467,11 +467,11 @@ export function LandingPage() {
         <main className="min-h-screen overflow-hidden bg-background text-foreground">
             <header className="sticky top-0 z-50 border-b border-border/70 bg-background/88 backdrop-blur-xl">
                 <nav className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-                    <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label="Flowbase home">
+                    <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label="NexMind home">
                         <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
                             <Sparkles className="size-4" aria-hidden="true" />
                         </span>
-                        <span className="truncate text-sm font-semibold">Flowbase</span>
+                        <span className="truncate text-sm font-semibold">NexMind</span>
                     </Link>
 
                     <div className="hidden items-center gap-1 md:flex">
@@ -503,7 +503,7 @@ export function LandingPage() {
                 </nav>
             </header>
 
-            <section className="relative border-b border-border/70 bg-[linear-gradient(180deg,hsl(42_82%_97%)_0%,hsl(0_0%_100%/.75)_58%,hsl(42_82%_97%)_100%)]">
+            <section className="relative border-b border-border/70 bg-[image:var(--hero-gradient)]">
                 <div className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-20">
                     <div className="max-w-3xl">
                         <div className="flex flex-wrap gap-2">
@@ -525,7 +525,7 @@ export function LandingPage() {
                             Your AI-powered workspace for notes, tasks, whiteboards, and team collaboration
                         </h1>
                         <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-                            Flowbase combines Notion-style notes, Miro-style whiteboards, Kanban boards, calendar planning,
+                            NexMind combines Notion-style notes, Miro-style whiteboards, Kanban boards, calendar planning,
                             AI assistance, template building, and real-time collaboration in one modern workspace.
                         </p>
                         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -566,7 +566,7 @@ export function LandingPage() {
                 <SectionHeader
                     eyebrow="Feature Highlights"
                     title="One workspace for every way your team thinks and ships"
-                    description="Flowbase brings planning, writing, visual thinking, AI generation, and collaboration into a single polished operating system."
+                    description="NexMind brings planning, writing, visual thinking, AI generation, and collaboration into a single polished operating system."
                 />
                 <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     {features.map((feature) => (
@@ -580,7 +580,7 @@ export function LandingPage() {
                     <SectionHeader
                         eyebrow="How It Works"
                         title="A calmer path from idea to execution"
-                        description="Flowbase keeps your work organized while AI handles the blank-page moments and collaboration keeps everyone aligned."
+                        description="NexMind keeps your work organized while AI handles the blank-page moments and collaboration keeps everyone aligned."
                     />
                     <div className="mt-12 grid gap-5 md:grid-cols-3">
                         {[
@@ -607,7 +607,7 @@ export function LandingPage() {
                 <SectionHeader
                     eyebrow="Product Showcase"
                     title="Product-specific mockups that preview the real workspace"
-                    description="Each view is designed around the way Flowbase already works: dashboards, notes, boards, whiteboards, and AI assistance."
+                    description="Each view is designed around the way NexMind already works: dashboards, notes, boards, whiteboards, and AI assistance."
                 />
                 <div className="mt-12 grid gap-5 lg:grid-cols-2">
                     <ShowcasePanel
@@ -703,7 +703,7 @@ export function LandingPage() {
                         <SectionHeader
                             eyebrow="AI Features"
                             title="AI that creates useful work, not just clever text"
-                            description="Ask Flowbase to plan, refine, schedule, diagram, build, and summarize inside the same workspace where your team executes."
+                            description="Ask NexMind to plan, refine, schedule, diagram, build, and summarize inside the same workspace where your team executes."
                             align="left"
                         />
                         <div className="mt-8 rounded-lg border border-border bg-background p-5 shadow-sm">
@@ -729,7 +729,7 @@ export function LandingPage() {
                     <SectionHeader
                         eyebrow="Collaboration"
                         title="Real-time teamwork without the tool sprawl"
-                        description="Flowbase keeps teams present in the same planning system with shared boards, comments, workspace context, and Liveblocks-powered collaboration."
+                        description="NexMind keeps teams present in the same planning system with shared boards, comments, workspace context, and Liveblocks-powered collaboration."
                         align="left"
                     />
                     <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -778,7 +778,7 @@ export function LandingPage() {
                     <SectionHeader
                         eyebrow="Use Cases"
                         title="Built for focused people and ambitious teams"
-                        description="Flowbase adapts from solo planning to team operations without forcing everyone into another rigid project management template."
+                        description="NexMind adapts from solo planning to team operations without forcing everyone into another rigid project management template."
                     />
                     <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {useCases.map(([title, description]) => (
@@ -842,7 +842,7 @@ export function LandingPage() {
                 <div className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
                     <SectionHeader
                         eyebrow="Testimonials"
-                        title="Teams choose Flowbase when work needs fewer handoffs"
+                        title="Teams choose NexMind when work needs fewer handoffs"
                         description="Placeholder stories for the kind of polished, professional proof points the page is ready to support."
                     />
                     <div className="mt-12 grid gap-5 lg:grid-cols-3">
@@ -913,7 +913,7 @@ export function LandingPage() {
                             <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                                 <Sparkles className="size-4" aria-hidden="true" />
                             </span>
-                            <span className="font-semibold">Flowbase</span>
+                            <span className="font-semibold">NexMind</span>
                         </Link>
                         <p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">
                             A premium AI productivity workspace for planning, notes, whiteboards, tasks, templates, and collaborative teams.
@@ -938,7 +938,7 @@ export function LandingPage() {
                 </div>
                 <div className="border-t border-border">
                     <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-5 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-                        <p>Copyright 2026 Flowbase. All rights reserved.</p>
+                        <p>Copyright 2026 NexMind. All rights reserved.</p>
                         <div className="flex gap-4">
                             <Link href="#" className="transition hover:text-foreground">
                                 X

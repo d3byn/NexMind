@@ -14,6 +14,7 @@ import { GeneratedAppPreview } from "@/app/ai-template-builder/generated-app-pre
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getGeneratedAppIcon } from "@/lib/generated-app-icons";
+import { cn } from "@/lib/utils";
 
 type AiTemplateBuilderWorkspaceProps = {
   initialApps: GeneratedAppDTO[];
@@ -94,9 +95,12 @@ export function AiTemplateBuilderWorkspace({ initialApps }: AiTemplateBuilderWor
   return (
     <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
       <div className="space-y-5">
-        <Card className="rounded-lg border-border bg-card shadow-sm">
+        <Card className="rounded-xl border-border bg-card shadow-sm">
           <CardContent className="p-5">
-            <label htmlFor="template-prompt" className="text-sm font-semibold text-foreground">
+            <label htmlFor="template-prompt" className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <span className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Sparkles className="size-3.5" aria-hidden="true" />
+              </span>
               What do you want to build?
             </label>
             <textarea
@@ -104,11 +108,11 @@ export function AiTemplateBuilderWorkspace({ initialApps }: AiTemplateBuilderWor
               value={prompt}
               onChange={(event) => setPrompt(event.target.value)}
               placeholder="Example: Build a cozy weekly meal planner with grocery list, nutrition goals, and prep tasks."
-              className="mt-3 min-h-36 w-full resize-none rounded-lg border border-border bg-background px-3 py-3 text-sm leading-6 outline-none transition focus:ring-2 focus:ring-primary/15"
+              className="mt-3 min-h-36 w-full resize-none rounded-xl border border-border bg-background px-3 py-3 text-sm leading-6 outline-none transition-colors focus:border-primary/40 focus:bg-card focus:ring-2 focus:ring-primary/15"
             />
             <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs leading-5 text-muted-foreground">
-                Gemini will return structured JSON, then Flowbase renders it as a single-page app preview.
+                Gemini will return structured JSON, then NexMind renders it as a single-page app preview.
               </p>
               <Button type="button" className="rounded-lg" disabled={isPending || !prompt.trim()} onClick={handleGenerate}>
                 {isPending ? <Loader2 className="mr-2 size-4 animate-spin" aria-hidden="true" /> : <Sparkles className="mr-2 size-4" aria-hidden="true" />}
@@ -126,43 +130,58 @@ export function AiTemplateBuilderWorkspace({ initialApps }: AiTemplateBuilderWor
               <h2 className="text-base font-semibold text-foreground">Created apps</h2>
               <p className="mt-1 text-sm text-muted-foreground">Your generated templates are private to your account.</p>
             </div>
-            <span className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground">
+            <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold tabular-nums text-muted-foreground">
               {apps.length} saved
             </span>
           </div>
 
           {apps.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-border bg-card p-6 text-center">
-              <Sparkles className="mx-auto size-6 text-primary" aria-hidden="true" />
-              <p className="mt-3 text-sm font-medium">No generated apps yet</p>
-              <p className="mt-1 text-sm text-muted-foreground">Describe a tracker, planner, or dashboard to create your first one.</p>
+            <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center">
+              <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--grape),hsl(244_74%_54%))] text-white shadow-md shadow-primary/25">
+                <Sparkles className="size-7" aria-hidden="true" />
+              </div>
+              <p className="mt-4 text-sm font-semibold">No generated apps yet</p>
+              <p className="mt-1.5 text-sm text-muted-foreground">Describe a tracker, planner, or dashboard to create your first one.</p>
             </div>
           ) : (
             <div className="grid gap-3">
               {apps.map((app) => {
                 const Icon = getGeneratedAppIcon(app.icon);
+                const isSelected = selectedApp?.id === app.id;
                 return (
                   <Card
                     key={app.id}
-                    className="rounded-lg border-border bg-card shadow-sm transition hover:border-primary/40"
+                    className={cn(
+                      "relative overflow-hidden rounded-xl bg-card shadow-sm transition-all duration-150",
+                      isSelected
+                        ? "border-primary/40 ring-2 ring-primary/20"
+                        : "border-border hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md",
+                    )}
                   >
-                    <CardContent className="p-4">
+                    <span className="absolute inset-y-0 left-0 w-1" style={{ backgroundColor: app.color }} aria-hidden="true" />
+                    <CardContent className="p-4 pl-5">
                       <button type="button" className="flex w-full gap-3 text-left" onClick={() => setSelectedAppId(app.id)}>
-                        <div className="flex size-10 shrink-0 items-center justify-center rounded-lg text-white" style={{ backgroundColor: app.color }}>
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl text-white" style={{ backgroundColor: app.color }}>
                           <Icon className="size-5" aria-hidden="true" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-1.5">
                             <h3 className="truncate text-sm font-semibold text-foreground">{app.appName}</h3>
-                            <span className="rounded-md border px-2 py-0.5 text-[11px] font-medium" style={{ borderColor: `${app.color}55`, color: app.color }}>
-                              {app.color}
-                            </span>
+                            {isSelected && (
+                              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">Previewing</span>
+                            )}
+                            {app.isInSidebar && (
+                              <span className="flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                                <PanelLeft className="size-2.5" aria-hidden="true" />
+                                In sidebar
+                              </span>
+                            )}
                           </div>
                           <p className="mt-1 line-clamp-2 text-sm leading-5 text-muted-foreground">{app.description}</p>
                           <p className="mt-2 text-xs text-muted-foreground">Created {formatDate(app.createdAt)}</p>
                         </div>
                       </button>
-                      <div className="mt-4 flex flex-wrap gap-2">
+                      <div className="mt-4 flex flex-wrap gap-2 border-t border-border/60 pt-3">
                         <Button asChild size="sm" variant="outline" className="rounded-lg bg-background">
                           <Link href={`/ai-template-builder/${app.id}`}>
                             <ExternalLink className="mr-1.5 size-3.5" aria-hidden="true" />
@@ -198,11 +217,13 @@ export function AiTemplateBuilderWorkspace({ initialApps }: AiTemplateBuilderWor
             }
           />
         ) : (
-          <div className="flex min-h-[32rem] items-center justify-center rounded-lg border border-dashed border-border bg-card p-8 text-center">
+          <div className="flex min-h-[32rem] items-center justify-center rounded-xl border border-dashed border-border bg-card p-8 text-center">
             <div>
-              <Sparkles className="mx-auto size-8 text-primary" aria-hidden="true" />
-              <p className="mt-3 text-sm font-medium">Generated preview appears here</p>
-              <p className="mt-1 max-w-sm text-sm leading-6 text-muted-foreground">
+              <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--grape),hsl(244_74%_54%))] text-white shadow-md shadow-primary/25">
+                <Sparkles className="size-7" aria-hidden="true" />
+              </div>
+              <p className="mt-4 text-sm font-semibold">Generated preview appears here</p>
+              <p className="mt-1.5 max-w-sm text-sm leading-6 text-muted-foreground">
                 Your mini app layout, sections, fields, actions, and sample data will render from saved JSON.
               </p>
             </div>

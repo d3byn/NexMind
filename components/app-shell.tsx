@@ -1,25 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronLeft, ChevronsUpDown, PanelLeftOpen, X } from "lucide-react";
 import {
-  Bot,
-  CalendarDays,
-  ChevronLeft,
-  ChevronsUpDown,
-  Columns3,
-  FileText,
-  Home,
-  LayoutTemplate,
-  LucideIcon,
-  PanelLeftOpen,
-  PenTool,
-  FolderKanban,
-  Search,
-  Settings,
-  Sparkles,
-  X,
-} from "lucide-react";
-import { ReactNode, useState } from "react";
+    BookOpenTextIcon,
+    BrainIcon,
+    CalendarCheckIcon,
+    CircleCheckBigIcon,
+    ClipboardIcon,
+    CpuIcon,
+    FolderOpenIcon,
+    HouseIcon,
+    LayoutDashboardIcon,
+    SettingsIcon,
+} from "@animateicons/react/lucide";
+import { ComponentType, ReactNode, RefAttributes, useRef, useState } from "react";
 
 import { toggleGeneratedAppSidebar } from "@/app/ai-template-builder/actions";
 import type { GeneratedSidebarAppDTO } from "@/app/ai-template-builder/actions";
@@ -28,47 +23,113 @@ import { getGeneratedAppIcon } from "@/lib/generated-app-icons";
 import { cn } from "@/lib/utils";
 import { UserButton } from "@clerk/nextjs";
 
+/**
+ * The animated icons render a <div> wrapping an <svg stroke="currentColor">, and expose
+ * start/stop handles via ref. Attaching a ref disables their built-in hover trigger, which is
+ * what we want: the whole nav row drives the animation, not just the 28px icon tile.
+ */
+type AnimatedIconHandle = { startAnimation: () => void; stopAnimation: () => void };
+type AnimatedIcon = ComponentType<
+    { size?: number; duration?: number; color?: string; className?: string; isAnimated?: boolean } & RefAttributes<AnimatedIconHandle>
+>;
+
 type NavItem = {
-  label: string;
-  href: string;
-  icon: LucideIcon;
-  color: string;
+    label: string;
+    href: string;
+    icon: AnimatedIcon;
+    /** Gradient tile behind the white icon — each destination gets its own hue. */
+    gradient: string;
+    glow: string;
 };
 
 type NavGroup = {
-  label: string;
-  items: NavItem[];
+    label: string;
+    items: NavItem[];
 };
 
 const navGroups: NavGroup[] = [
-  {
-    label: "Home",
-    items: [
-      { label: "Dashboard", href: "/dashboard", icon: Home, color: "text-clay-600" },
-      { label: "AI Assistant", href: "/ai-assistant", icon: Bot, color: "text-violet-500" },
-    ],
-  },
-  {
-    label: "Workspace",
-    items: [
-      { label: "Calendar", href: "/calendar", icon: CalendarDays, color: "text-sage-600" },
-      { label: "Task / Kanban", href: "/kanban", icon: Columns3, color: "text-amber-600" },
-      { label: "Notes", href: "/notes", icon: FileText, color: "text-sky-600" },
-      { label: "Whiteboard", href: "/whiteboard", icon: PenTool, color: "text-coral-500" },
-      { label: "Pages / Spaces", href: "/spaces", icon: FolderKanban, color: "text-violet-500" },
-    ],
-  },
-  {
-    label: "Build",
-    items: [
-      { label: "AI Template Builder", href: "/ai-template-builder", icon: LayoutTemplate, color: "text-rose-500" },
-      { label: "Settings", href: "/settings", icon: Settings, color: "text-stone-500" },
-    ],
-  },
+    {
+        label: "Home",
+        items: [
+            {
+                label: "Dashboard",
+                href: "/dashboard",
+                icon: HouseIcon,
+                gradient: "bg-[linear-gradient(135deg,#818CF8,#4F46E5)]",
+                glow: "shadow-indigo-500/40",
+            },
+            {
+                label: "AI Assistant",
+                href: "/ai-assistant",
+                icon: CpuIcon,
+                gradient: "bg-[linear-gradient(135deg,#C084FC,#7C3AED)]",
+                glow: "shadow-purple-500/40",
+            },
+        ],
+    },
+    {
+        label: "Workspace",
+        items: [
+            {
+                label: "Calendar",
+                href: "/calendar",
+                icon: CalendarCheckIcon,
+                gradient: "bg-[linear-gradient(135deg,#34D399,#059669)]",
+                glow: "shadow-emerald-500/40",
+            },
+            {
+                label: "Task / Kanban",
+                href: "/kanban",
+                icon: CircleCheckBigIcon,
+                gradient: "bg-[linear-gradient(135deg,#FBBF24,#D97706)]",
+                glow: "shadow-amber-500/40",
+            },
+            {
+                label: "Notes",
+                href: "/notes",
+                icon: BookOpenTextIcon,
+                gradient: "bg-[linear-gradient(135deg,#38BDF8,#0284C7)]",
+                glow: "shadow-sky-500/40",
+            },
+            {
+                label: "Whiteboard",
+                href: "/whiteboard",
+                icon: ClipboardIcon,
+                gradient: "bg-[linear-gradient(135deg,#FB7185,#E11D48)]",
+                glow: "shadow-rose-500/40",
+            },
+            {
+                label: "Pages / Spaces",
+                href: "/spaces",
+                icon: FolderOpenIcon,
+                gradient: "bg-[linear-gradient(135deg,#2DD4BF,#0D9488)]",
+                glow: "shadow-teal-500/40",
+            },
+        ],
+    },
+    {
+        label: "Build",
+        items: [
+            {
+                label: "AI Template Builder",
+                href: "/ai-template-builder",
+                icon: LayoutDashboardIcon,
+                gradient: "bg-[linear-gradient(135deg,#FB923C,#EA580C)]",
+                glow: "shadow-orange-500/40",
+            },
+            {
+                label: "Settings",
+                href: "/settings",
+                icon: SettingsIcon,
+                gradient: "bg-[linear-gradient(135deg,#A5B4FC,#64748B)]",
+                glow: "shadow-slate-500/40",
+            },
+        ],
+    },
 ];
 
 type AppShellProps = {
-  activePage:
+    activePage:
     | "dashboard"
     | "ai-assistant"
     | "calendar"
@@ -78,216 +139,246 @@ type AppShellProps = {
     | "spaces"
     | "ai-template-builder"
     | "settings";
-  generatedSidebarApps?: GeneratedSidebarAppDTO[];
-  children: ReactNode;
+    generatedSidebarApps?: GeneratedSidebarAppDTO[];
+    children: ReactNode;
 };
 
-export function AppShell({ activePage, generatedSidebarApps = [], children }: AppShellProps) {
-  const [collapsed, setCollapsed] = useState(false);
-  const [sidebarApps, setSidebarApps] = useState(generatedSidebarApps);
+function SidebarNavItem({ item, active, collapsed }: { item: NavItem; active: boolean; collapsed: boolean }) {
+    const iconRef = useRef<AnimatedIconHandle>(null);
+    const Icon = item.icon;
 
-  function removeGeneratedSidebarApp(appId: number) {
-    setSidebarApps((current) => current.filter((app) => app.id !== appId));
-    toggleGeneratedAppSidebar(appId, false).catch(() => setSidebarApps(generatedSidebarApps));
-  }
-
-  return (
-    <div className="h-screen bg-background text-foreground">
-      <div className="flex h-screen overflow-hidden">
-        <aside
-          className={cn(
-            "flex h-screen max-h-screen shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar px-2.5 py-3.5 shadow-[1px_0_24px_rgba(70,54,40,0.05)] transition-[width] duration-300 ease-out",
-            collapsed ? "w-[4.5rem]" : "w-64 max-sm:w-[4.5rem]",
-          )}
-        >
-          <div className="flex h-11 items-center gap-2.5">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-              <Sparkles className="size-4" aria-hidden="true" />
-            </div>
-            <div
-              className={cn(
-                "min-w-0 transition-opacity duration-200 max-sm:hidden",
-                collapsed && "pointer-events-none opacity-0",
-              )}
-            >
-              <p className="truncate text-[13px] font-semibold leading-5">Flowbase</p>
-              <p className="truncate text-xs text-muted-foreground">Cozy workspace</p>
-            </div>
-          </div>
-
-          <div className="mt-4 flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-9 shrink-0 rounded-lg border border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground"
-              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-              title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-              onClick={() => setCollapsed((value) => !value)}
-            >
-              {collapsed ? (
-                <PanelLeftOpen className="size-3.5" aria-hidden="true" />
-              ) : (
-                <ChevronLeft className="size-3.5" aria-hidden="true" />
-              )}
-            </Button>
-            <div
-              className={cn(
-                "flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg border border-border bg-card px-2.5 text-xs text-muted-foreground transition-opacity duration-200 max-sm:hidden",
-                collapsed && "pointer-events-none opacity-0",
-              )}
-            >
-              <Search className="size-3.5 shrink-0" aria-hidden="true" />
-              <span className="truncate">Search everything</span>
-            </div>
-          </div>
-
-          <nav className="mt-5 flex min-h-0 flex-1 flex-col gap-3 overflow-hidden" aria-label="Primary navigation">
-            {navGroups.map((group) => (
-              <div key={group.label} className="space-y-1">
-                <p
-                  className={cn(
-                    "px-2.5 text-[10px] font-semibold uppercase leading-5 tracking-[0.08em] text-muted-foreground/75 transition-opacity duration-200",
-                    collapsed && "sr-only",
-                    "max-sm:sr-only",
-                  )}
-                >
-                  {group.label}
-                </p>
-                {group.items.map((item) => {
-                  const Icon = item.icon;
-                  const active =
-                    (activePage === "dashboard" && item.href === "/dashboard") ||
-                    (activePage === "ai-assistant" && item.href === "/ai-assistant") ||
-                    (activePage === "calendar" && item.href === "/calendar") ||
-                    (activePage === "kanban" && item.href === "/kanban") ||
-                    (activePage === "notes" && item.href === "/notes") ||
-                    (activePage === "whiteboard" && item.href === "/whiteboard") ||
-                    (activePage === "spaces" && item.href === "/spaces") ||
-                    (activePage === "ai-template-builder" && item.href === "/ai-template-builder") ||
-                    (activePage === "settings" && item.href === "/settings");
-
-                  return (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      aria-label={item.label}
-                      title={collapsed ? item.label : undefined}
-                      className={cn(
-                        "group flex h-9 items-center rounded-lg px-2.5 text-[13px] font-medium transition-colors",
-                        collapsed ? "justify-center" : "gap-2.5 max-sm:justify-center",
-                        active
-                          ? "bg-primary/10 text-primary shadow-[inset_0_0_0_1px_rgba(255,112,87,0.16)]"
-                          : "text-muted-foreground hover:bg-accent hover:text-foreground",
-                      )}
-                    >
-                      <Icon className={cn("size-4 shrink-0", item.color)} aria-hidden="true" />
-                      <span
-                        className={cn(
-                          "min-w-0 truncate transition-[opacity,width] duration-200",
-                          collapsed && "w-0 opacity-0",
-                          "max-sm:hidden",
-                        )}
-                      >
-                        {item.label}
-                      </span>
-                    </Link>
-                  );
-                })}
-              </div>
-            ))}
-            {sidebarApps.length > 0 && (
-              <div className="space-y-1">
-                <p
-                  className={cn(
-                    "px-2.5 text-[10px] font-semibold uppercase leading-5 tracking-[0.08em] text-muted-foreground/75 transition-opacity duration-200",
-                    collapsed && "sr-only",
-                    "max-sm:sr-only",
-                  )}
-                >
-                  Generated
-                </p>
-                {sidebarApps.map((app) => {
-                  const Icon = getGeneratedAppIcon(app.icon);
-                  return (
-                    <div key={app.id} className="group flex items-center">
-                      <Link
-                        href={`/ai-template-builder/${app.id}`}
-                        aria-label={app.appName}
-                        title={collapsed ? app.appName : undefined}
-                        className={cn(
-                          "flex h-9 min-w-0 flex-1 items-center rounded-lg px-2.5 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
-                          collapsed ? "justify-center" : "gap-2.5 max-sm:justify-center",
-                        )}
-                      >
-                        <Icon className="size-4 shrink-0" style={{ color: app.color }} aria-hidden="true" />
-                        <span
-                          className={cn(
-                            "min-w-0 truncate transition-[opacity,width] duration-200",
-                            collapsed && "w-0 opacity-0",
-                            "max-sm:hidden",
-                          )}
-                        >
-                          {app.appName}
-                        </span>
-                      </Link>
-                      <button
-                        type="button"
-                        className={cn(
-                          "mr-1 flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition hover:bg-background hover:text-foreground group-hover:opacity-100",
-                          collapsed && "hidden",
-                          "max-sm:hidden",
-                        )}
-                        aria-label={`Remove ${app.appName} from sidebar`}
-                        title={`Remove ${app.appName} from sidebar`}
-                        onClick={() => removeGeneratedSidebarApp(app.id)}
-                      >
-                        <X className="size-3" aria-hidden="true" />
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
+    return (
+        <Link
+            href={item.href}
+            aria-label={item.label}
+            title={collapsed ? item.label : undefined}
+            onMouseEnter={() => iconRef.current?.startAnimation()}
+            onMouseLeave={() => iconRef.current?.stopAnimation()}
+            onFocus={() => iconRef.current?.startAnimation()}
+            onBlur={() => iconRef.current?.stopAnimation()}
+            className={cn(
+                "group relative flex h-9 items-center rounded-lg px-2 text-[13px] font-medium transition-all duration-150",
+                collapsed ? "justify-center" : "gap-2.5 max-sm:justify-center",
+                active
+                    ? "bg-[linear-gradient(90deg,hsl(252_88%_94%),hsl(252_88%_94%/.35))] font-semibold text-primary shadow-sm"
+                    : "text-muted-foreground hover:translate-x-0.5 hover:bg-accent hover:text-foreground",
             )}
-          </nav>
-
-          <div className="shrink-0 border-t border-border pt-3">
+        >
+            {active && (
+                <span
+                    className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-[linear-gradient(180deg,var(--grape),hsl(244_74%_54%))]"
+                    aria-hidden="true"
+                />
+            )}
             <div
-              className={cn(
-                "flex items-center rounded-lg bg-card p-1.5 shadow-sm",
-                collapsed ? "justify-center" : "gap-2.5",
-              )}
+                className={cn(
+                    "flex size-7 shrink-0 items-center justify-center rounded-lg shadow-sm transition-all duration-200 group-hover:scale-110",
+                    item.gradient,
+                    item.glow,
+                    active ? "shadow-md ring-2 ring-white/70" : "group-hover:shadow-md",
+                )}
             >
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sage-100 text-sage-700">
-                <UserButton />
-              </div>
-              <div
-                className={cn(
-                  "min-w-0 flex-1 transition-opacity duration-200",
-                  "max-sm:hidden",
-                  collapsed && "pointer-events-none hidden opacity-0",
-                )}
-              >
-                <p className="truncate text-[13px] font-medium">Studio space</p>
-                <p className="truncate text-[11px] text-muted-foreground">5 collaborators</p>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  "size-7 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground",
-                  "max-sm:hidden",
-                  collapsed && "hidden",
-                )}
-                aria-label="Workspace menu"
-              >
-                <ChevronsUpDown className="size-3.5" aria-hidden="true" />
-              </Button>
+                <Icon ref={iconRef} size={16} duration={1} color="#ffffff" isAnimated />
             </div>
-          </div>
-        </aside>
+            <span
+                className={cn(
+                    "min-w-0 truncate transition-[opacity,transform] ease-[cubic-bezier(0.32,0.72,0,1)]",
+                    collapsed ? "w-0 -translate-x-1 opacity-0 duration-150" : "translate-x-0 opacity-100 delay-150 duration-200",
+                    "max-sm:hidden",
+                )}
+            >
+                {item.label}
+            </span>
+        </Link>
+    );
+}
 
-        <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
-      </div>
-    </div>
-  );
+export function AppShell({ activePage, generatedSidebarApps = [], children }: AppShellProps) {
+    const [collapsed, setCollapsed] = useState(false);
+    const [sidebarApps, setSidebarApps] = useState(generatedSidebarApps);
+    const brandIconRef = useRef<AnimatedIconHandle>(null);
+
+    function removeGeneratedSidebarApp(appId: number) {
+        setSidebarApps((current) => current.filter((app) => app.id !== appId));
+        toggleGeneratedAppSidebar(appId, false).catch(() => setSidebarApps(generatedSidebarApps));
+    }
+
+    return (
+        <div className="h-screen text-foreground">
+            <div className="flex h-screen overflow-hidden">
+                <aside
+                    className={cn(
+                        "flex h-screen max-h-screen shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar/75 px-2.5 py-3.5 shadow-[1px_0_24px_rgba(39,39,87,0.06)] backdrop-blur-xl transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] will-change-[width]",
+                        collapsed ? "w-[4.5rem]" : "w-64 max-sm:w-[4.5rem]",
+                    )}
+                >
+                    {}
+                    <div
+                        className={cn(
+                            "flex gap-2.5",
+                            collapsed ? "flex-col items-center" : "h-11 flex-row items-center max-sm:flex-col max-sm:items-center",
+                        )}
+                    >
+                        <div
+                            className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-[linear-gradient(135deg,var(--grape),hsl(244_74%_54%)_55%,var(--eclipse-900))] shadow-md shadow-primary/30 transition-transform duration-200 hover:scale-105"
+                            onMouseEnter={() => brandIconRef.current?.startAnimation()}
+                            onMouseLeave={() => brandIconRef.current?.stopAnimation()}
+                        >
+                            <BrainIcon ref={brandIconRef} size={20} duration={1} color="#ffffff" isAnimated />
+                        </div>
+                        <div
+                            className={cn(
+                                "min-w-0 overflow-hidden transition-[opacity,transform] ease-[cubic-bezier(0.32,0.72,0,1)] max-sm:hidden",
+                                collapsed
+                                    ? "pointer-events-none w-0 -translate-x-1 opacity-0 duration-150"
+                                    : "flex-1 translate-x-0 opacity-100 delay-150 duration-200",
+                            )}
+                        >
+                            <p className="truncate text-[13px] font-semibold leading-5">NexMind</p>
+                        </div>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-9 shrink-0 rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:border-primary/40 hover:bg-accent hover:text-primary"
+                            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                            aria-expanded={!collapsed}
+                            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                            onClick={() => setCollapsed((value) => !value)}
+                        >
+                            {collapsed ? (
+                                <PanelLeftOpen className="size-3.5" aria-hidden="true" />
+                            ) : (
+                                <ChevronLeft className="size-3.5" aria-hidden="true" />
+                            )}
+                        </Button>
+                    </div>
+
+                    <nav className="mt-5 flex min-h-0 flex-1 flex-col gap-3 overflow-hidden" aria-label="Primary navigation">
+                        {navGroups.map((group) => (
+                            <div key={group.label} className="space-y-1">
+                                <p
+                                    className={cn(
+                                        "px-2.5 text-[10px] font-semibold uppercase leading-5 tracking-[0.08em] text-muted-foreground/75 transition-opacity duration-200",
+                                        collapsed && "sr-only",
+                                        "max-sm:sr-only",
+                                    )}
+                                >
+                                    {group.label}
+                                </p>
+                                {group.items.map((item) => {
+                                    const active =
+                                        (activePage === "dashboard" && item.href === "/dashboard") ||
+                                        (activePage === "ai-assistant" && item.href === "/ai-assistant") ||
+                                        (activePage === "calendar" && item.href === "/calendar") ||
+                                        (activePage === "kanban" && item.href === "/kanban") ||
+                                        (activePage === "notes" && item.href === "/notes") ||
+                                        (activePage === "whiteboard" && item.href === "/whiteboard") ||
+                                        (activePage === "spaces" && item.href === "/spaces") ||
+                                        (activePage === "ai-template-builder" && item.href === "/ai-template-builder") ||
+                                        (activePage === "settings" && item.href === "/settings");
+
+                                    return <SidebarNavItem key={item.label} item={item} active={active} collapsed={collapsed} />;
+                                })}
+                            </div>
+                        ))}
+                        {sidebarApps.length > 0 && (
+                            <div className="space-y-1">
+                                <p
+                                    className={cn(
+                                        "px-2.5 text-[10px] font-semibold uppercase leading-5 tracking-[0.08em] text-muted-foreground/75 transition-opacity duration-200",
+                                        collapsed && "sr-only",
+                                        "max-sm:sr-only",
+                                    )}
+                                >
+                                    Generated
+                                </p>
+                                {sidebarApps.map((app) => {
+                                    const Icon = getGeneratedAppIcon(app.icon);
+                                    return (
+                                        <div key={app.id} className="group flex items-center">
+                                            <Link
+                                                href={`/ai-template-builder/${app.id}`}
+                                                aria-label={app.appName}
+                                                title={collapsed ? app.appName : undefined}
+                                                className={cn(
+                                                    "group flex h-9 min-w-0 flex-1 items-center rounded-lg px-2 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
+                                                    collapsed ? "justify-center" : "gap-2.5 max-sm:justify-center",
+                                                )}
+                                            >
+                                                <span
+                                                    className="flex size-7 shrink-0 items-center justify-center rounded-lg text-white shadow-sm transition-transform duration-200 group-hover:scale-110"
+                                                    style={{ backgroundImage: `linear-gradient(135deg, ${app.color}, ${app.color}b3)` }}
+                                                >
+                                                    <Icon className="size-4" aria-hidden="true" />
+                                                </span>
+                                                <span
+                                                    className={cn(
+                                                        "min-w-0 truncate transition-[opacity,transform] ease-[cubic-bezier(0.32,0.72,0,1)]",
+                                                        collapsed ? "w-0 -translate-x-1 opacity-0 duration-150" : "translate-x-0 opacity-100 delay-150 duration-200",
+                                                        "max-sm:hidden",
+                                                    )}
+                                                >
+                                                    {app.appName}
+                                                </span>
+                                            </Link>
+                                            <button
+                                                type="button"
+                                                className={cn(
+                                                    "mr-1 flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition hover:bg-background hover:text-foreground group-hover:opacity-100",
+                                                    collapsed && "hidden",
+                                                    "max-sm:hidden",
+                                                )}
+                                                aria-label={`Remove ${app.appName} from sidebar`}
+                                                title={`Remove ${app.appName} from sidebar`}
+                                                onClick={() => removeGeneratedSidebarApp(app.id)}
+                                            >
+                                                <X className="size-3" aria-hidden="true" />
+                                            </button>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </nav>
+
+                    <div className="shrink-0 border-t border-border pt-3">
+                        <div
+                            className={cn(
+                                "flex items-center rounded-lg bg-card p-1.5 shadow-sm",
+                                collapsed ? "justify-center" : "gap-2.5",
+                            )}
+                        >
+                            <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sage-100 text-sage-700">
+                                <UserButton />
+                            </div>
+                            <div
+                                className={cn(
+                                    "min-w-0 flex-1 transition-opacity duration-200",
+                                    "max-sm:hidden",
+                                    collapsed && "pointer-events-none hidden opacity-0",
+                                )}
+                            >
+                                <p className="truncate text-[13px] font-medium">Studio space</p>
+                                <p className="truncate text-[11px] text-muted-foreground">5 collaborators</p>
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className={cn(
+                                    "size-7 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground",
+                                    "max-sm:hidden",
+                                    collapsed && "hidden",
+                                )}
+                                aria-label="Workspace menu"
+                            >
+                                <ChevronsUpDown className="size-3.5" aria-hidden="true" />
+                            </Button>
+                        </div>
+                    </div>
+                </aside>
+
+                <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
+            </div>
+        </div>
+    );
 }

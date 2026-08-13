@@ -2,7 +2,6 @@
 
 import { currentUser } from "@clerk/nextjs/server";
 import { and, asc, eq, inArray } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 
 import { calendarItems, db, kanbanBoardShares, kanbanBoards, kanbanColumns, kanbanTasks, users } from "@/db";
 import { assertFreePlanLimit } from "@/lib/user-preferences";
@@ -495,7 +494,6 @@ export async function createKanbanBoard(input: BoardInput) {
   await db.insert(kanbanColumns).values(defaultColumns.map((columnName, index) => ({ boardId: board.id, name: columnName, position: index })));
   await upsertLiveblocksRoom(board.id);
 
-  revalidatePath("/kanban");
   return (await listKanbanBoards()).find((nextBoard) => nextBoard.id === board.id)!;
 }
 
@@ -513,7 +511,6 @@ export async function updateKanbanBoard(boardId: number, input: BoardInput) {
     .set({ name, color: normalizeBoardColor(input.color), updatedAt: new Date() })
     .where(and(eq(kanbanBoards.id, boardId), eq(kanbanBoards.userId, user.id)));
 
-  revalidatePath("/kanban");
   return listKanbanBoards();
 }
 
@@ -532,8 +529,6 @@ export async function deleteKanbanBoard(boardId: number) {
   await deleteLinkedCalendarItems(tasks.map((task) => task.calendarItemId).filter((id): id is number => Boolean(id)), user.id);
   await db.delete(kanbanBoards).where(and(eq(kanbanBoards.id, boardId), eq(kanbanBoards.userId, user.id)));
 
-  revalidatePath("/kanban");
-  revalidatePath("/calendar");
   return listKanbanBoards();
 }
 
@@ -573,7 +568,6 @@ export async function inviteKanbanCollaborator(input: InviteInput) {
     });
 
   await upsertLiveblocksRoom(board.id);
-  revalidatePath("/kanban");
 
   return listKanbanBoards();
 }
@@ -595,7 +589,6 @@ export async function createKanbanColumn(input: ColumnInput) {
   await db.insert(kanbanColumns).values({ boardId: input.boardId, name, position, updatedAt: new Date() });
   await db.update(kanbanBoards).set({ updatedAt: new Date() }).where(eq(kanbanBoards.id, input.boardId));
 
-  revalidatePath("/kanban");
   return listKanbanBoards();
 }
 
@@ -611,7 +604,6 @@ export async function updateKanbanColumn(columnId: number, name: string) {
   await db.update(kanbanColumns).set({ name: nextName, updatedAt: new Date() }).where(eq(kanbanColumns.id, columnId));
   await db.update(kanbanBoards).set({ updatedAt: new Date() }).where(eq(kanbanBoards.id, column.boardId));
 
-  revalidatePath("/kanban");
   return listKanbanBoards();
 }
 
@@ -624,8 +616,6 @@ export async function deleteKanbanColumn(columnId: number) {
   await db.delete(kanbanColumns).where(eq(kanbanColumns.id, columnId));
   await db.update(kanbanBoards).set({ updatedAt: new Date() }).where(eq(kanbanBoards.id, column.boardId));
 
-  revalidatePath("/kanban");
-  revalidatePath("/calendar");
   return listKanbanBoards();
 }
 
@@ -663,8 +653,6 @@ export async function createKanbanTask(input: TaskInput) {
   });
   await db.update(kanbanBoards).set({ updatedAt: new Date() }).where(eq(kanbanBoards.id, board.id));
 
-  revalidatePath("/kanban");
-  revalidatePath("/calendar");
   return listKanbanBoards();
 }
 
@@ -705,8 +693,6 @@ export async function updateKanbanTask(taskId: number, input: TaskInput) {
     .where(eq(kanbanTasks.id, taskId));
   await db.update(kanbanBoards).set({ updatedAt: new Date() }).where(eq(kanbanBoards.id, board.id));
 
-  revalidatePath("/kanban");
-  revalidatePath("/calendar");
   return listKanbanBoards();
 }
 
@@ -718,8 +704,6 @@ export async function deleteKanbanTask(taskId: number) {
   await db.delete(kanbanTasks).where(eq(kanbanTasks.id, taskId));
   await db.update(kanbanBoards).set({ updatedAt: new Date() }).where(eq(kanbanBoards.id, board.id));
 
-  revalidatePath("/kanban");
-  revalidatePath("/calendar");
   return listKanbanBoards();
 }
 
@@ -743,6 +727,5 @@ export async function moveKanbanTask(taskId: number, targetColumnId: number, tar
   );
   await db.update(kanbanBoards).set({ updatedAt: new Date() }).where(eq(kanbanBoards.id, board.id));
 
-  revalidatePath("/kanban");
   return listKanbanBoards();
 }
