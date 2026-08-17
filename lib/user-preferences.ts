@@ -20,6 +20,7 @@ import {
     whiteboards,
 } from "@/db";
 import { getLiveblocksUserId, normalizeCollaborationEmail } from "@/lib/liveblocks";
+import { isTheme, type Theme } from "@/lib/theme";
 
 export const categoryScopes = ["calendar", "task", "note", "reminder"] as const;
 export type CategoryScope = (typeof categoryScopes)[number];
@@ -106,6 +107,25 @@ export const getCurrentDatabaseUser = cache(async () => {
         .returning({ id: users.id, email: users.email, name: users.name, clerkId: users.clerkId });
 
     return databaseUser;
+});
+
+
+export const getSavedThemePreference = cache(async (): Promise<Theme | null> => {
+    const { userId } = await auth();
+    if (!userId) return null;
+
+    try {
+        const [row] = await db
+            .select({ theme: userSettings.theme })
+            .from(userSettings)
+            .innerJoin(users, eq(users.id, userSettings.userId))
+            .where(eq(users.clerkId, userId))
+            .limit(1);
+
+        return isTheme(row?.theme) ? row.theme : null;
+    } catch {
+        return null;
+    }
 });
 
 export async function isCurrentUserPro() {
