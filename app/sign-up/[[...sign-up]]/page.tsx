@@ -1,9 +1,27 @@
 import { SignUp } from "@clerk/nextjs";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+
+import { PageIcon } from "@/components/page-icon";
+import { pageIcons } from "@/lib/page-icons";
 
 export default function SignUpPage() {
   return (
-    <main style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0F0E47' }}>
-      <SignUp fallbackRedirectUrl="/dashboard" />
+    <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 py-12">
+      <Link href="/" className="flex items-center gap-2.5" aria-label="NexMind home">
+        <PageIcon icon={pageIcons.brand.icon} gradient={pageIcons.brand.gradient} glow={pageIcons.brand.glow} size="sm" />
+        <span className="text-base font-semibold tracking-tight text-foreground">NexMind</span>
+      </Link>
+
+      <SignUp fallbackRedirectUrl="/dashboard" signInUrl="/sign-in" />
+
+      <Link
+        href="/"
+        className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="size-3.5" aria-hidden="true" />
+        Back to home
+      </Link>
     </main>
   );
 }
