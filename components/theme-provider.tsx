@@ -2,9 +2,10 @@
 
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-export type Theme = "light" | "dark" | "system";
+import { isTheme, THEME_STORAGE_KEY, type Theme } from "@/lib/theme";
 
-export const THEME_STORAGE_KEY = "nexmind-theme";
+export { THEME_STORAGE_KEY };
+export type { Theme };
 
 type ThemeContextValue = {
     theme: Theme;
@@ -30,12 +31,19 @@ function readStoredTheme(): Theme | null {
     if (typeof window === "undefined") return null;
     try {
         const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-        return stored === "light" || stored === "dark" || stored === "system" ? stored : null;
+        return isTheme(stored) ? stored : null;
     } catch {
         return null;
     }
 }
 
+function storeTheme(theme: Theme) {
+    try {
+        window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch {
+
+    }
+}
 
 function applyTheme(theme: Theme) {
     const isDark = theme === "dark" || (theme === "system" && systemPrefersDark());
@@ -45,15 +53,17 @@ function applyTheme(theme: Theme) {
     return isDark;
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-    const [theme, setThemeState] = useState<Theme>("system");
+
+export function ThemeProvider({ initialTheme = null, children }: { initialTheme?: Theme | null; children: ReactNode }) {
+    const [theme, setThemeState] = useState<Theme>(initialTheme ?? "system");
     const [isDark, setIsDark] = useState(false);
 
     useEffect(() => {
-        const stored = readStoredTheme() ?? "system";
-        setThemeState(stored);
-        setIsDark(applyTheme(stored));
-    }, []);
+        const next = initialTheme ?? readStoredTheme() ?? "system";
+        setThemeState(next);
+        setIsDark(applyTheme(next));
+        if (initialTheme) storeTheme(initialTheme);
+    }, [initialTheme]);
 
     useEffect(() => {
         if (theme !== "system") return;
@@ -67,11 +77,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const setTheme = useCallback((next: Theme) => {
         setThemeState(next);
         setIsDark(applyTheme(next));
-        try {
-            window.localStorage.setItem(THEME_STORAGE_KEY, next);
-        } catch {
-            
-        }
+        storeTheme(next);
     }, []);
 
     const value = useMemo<ThemeContextValue>(
