@@ -235,11 +235,7 @@ export function SpacesWorkspace({ initialData }: { initialData: SpacesDataDTO })
     [selectedPageId, selectedSpace],
   );
 
-  /*
-   * The title input used to fire updatePage() on every keystroke, and each call replaced the
-   * whole spaces dataset in state — so typing re-rendered the entire page, editor included.
-   * Keep a local draft and write once the user pauses.
-   */
+  
   const [titleDraft, setTitleDraft] = useState(selectedPage?.title ?? "");
   const [titleDraftPageId, setTitleDraftPageId] = useState(selectedPage?.id ?? null);
   const titleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
