@@ -7,7 +7,7 @@ import { db, whiteboards } from "@/db";
 import { assertAiFeatureEnabled, assertFreePlanLimit, getCurrentDatabaseUser, recordAiAction } from "@/lib/user-preferences";
 
 const whiteboardColors = ["sage", "clay", "amber", "sky", "violet"] as const;
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-3.1-flash-lite";
 
 export type WhiteboardColor = (typeof whiteboardColors)[number];
 export type WhiteboardScene = Record<string, unknown>;

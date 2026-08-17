@@ -1,5 +1,6 @@
 import {
     BookOpenTextIcon,
+    BrainIcon,
     CalendarCheckIcon,
     CircleCheckBigIcon,
     ClipboardIcon,
@@ -13,6 +14,11 @@ import {
 import type { AnimatedIcon } from "@/components/page-icon";
 
 export const pageIcons = {
+    brand: {
+        icon: BrainIcon as AnimatedIcon,
+        gradient: "bg-[linear-gradient(135deg,var(--grape),hsl(244_74%_54%)_55%,var(--eclipse-900))]",
+        glow: "shadow-primary/30",
+    },
     dashboard: {
         icon: HouseIcon as AnimatedIcon,
         gradient: "bg-[linear-gradient(135deg,#818CF8,#4F46E5)]",
