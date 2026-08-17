@@ -160,7 +160,7 @@ function SidebarNavItem({ item, active, collapsed }: { item: NavItem; active: bo
                 "group relative flex h-9 items-center rounded-lg px-2 text-[13px] font-medium transition-all duration-150",
                 collapsed ? "justify-center" : "gap-2.5 max-sm:justify-center",
                 active
-                    ? "bg-[linear-gradient(90deg,hsl(252_88%_94%),hsl(252_88%_94%/.35))] font-semibold text-primary shadow-sm"
+                    ? "bg-[image:var(--nav-active)] font-semibold text-primary shadow-sm"
                     : "text-muted-foreground hover:translate-x-0.5 hover:bg-accent hover:text-foreground",
             )}
         >
@@ -175,7 +175,7 @@ function SidebarNavItem({ item, active, collapsed }: { item: NavItem; active: bo
                     "flex size-7 shrink-0 items-center justify-center rounded-lg shadow-sm transition-all duration-200 group-hover:scale-110",
                     item.gradient,
                     item.glow,
-                    active ? "shadow-md ring-2 ring-white/70" : "group-hover:shadow-md",
+                    active ? "shadow-md ring-2 ring-[color:var(--nav-active-ring)]" : "group-hover:shadow-md",
                 )}
             >
                 <Icon ref={iconRef} size={16} duration={1} color="#ffffff" isAnimated />
@@ -208,7 +208,7 @@ export function AppShell({ activePage, generatedSidebarApps = [], children }: Ap
             <div className="flex h-screen overflow-hidden">
                 <aside
                     className={cn(
-                        "flex h-screen max-h-screen shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar/75 px-2.5 py-3.5 shadow-[1px_0_24px_rgba(39,39,87,0.06)] backdrop-blur-xl transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] will-change-[width]",
+                        "flex h-screen max-h-screen shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar/75 px-2.5 py-3.5 [box-shadow:var(--sidebar-shadow)] backdrop-blur-xl transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] will-change-[width]",
                         collapsed ? "w-[4.5rem]" : "w-64 max-sm:w-[4.5rem]",
                     )}
                 >
